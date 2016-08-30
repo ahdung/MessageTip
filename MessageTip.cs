@@ -354,14 +354,14 @@ MUEPCkQu+eSUV255DwrrS65Kum4eyRJNAy304aSXXrriTk8wOgg4gIB22okbjjbrICC9E/jnuEcR
                 //横向处理。距离屏幕左右两边太近时的处理
                 //多屏下left可能为负，所以right = width - (-left) = width + left
                 int dist = 10; //至少距离边缘多少像素
-                int right;
-                if (p.X < screen.Left + dist)
+                int left, right;
+                if (p.X < (left = screen.Left + dist))
                 {
-                    p.X = screen.Left + dist;
+                    p.X = left;
                 }
-                else if (p.X + this.Width > (right = screen.Width + screen.Left) - dist)
+                else if (p.X + this.Width > (right = screen.Width + screen.Left - dist))
                 {
-                    p.X = right - dist - this.Width;
+                    p.X = right - this.Width;
                 }
 
                 //纵向处理。默认在上方显示

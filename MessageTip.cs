@@ -2,13 +2,15 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 
 namespace AhDung.WinForm
 {
     /// <summary>
-    /// 轻快型消息提示类
+    /// 轻快型消息框
     /// </summary>
     public static class MessageTip
     {
@@ -24,7 +26,7 @@ namespace AhDung.WinForm
         /// <summary>
         /// 是否允许上浮动画。默认true
         /// </summary>
-        public static bool AllowFloating { get; set; }//todo 在鼠标附近弹稍有不妥，得再想想
+        public static bool AllowFloating { get; set; }
 
         static MessageTip()
         {
@@ -49,13 +51,36 @@ namespace AhDung.WinForm
         }
 
         /// <summary>
+        /// 在指定控件附近显示良好消息，图标为绿勾 √
+        /// </summary>
+        /// <param name="controlOrItem">控件或工具栏项</param>
+        /// <param name="text">消息文本</param>
+        /// <param name="delay">消息停留时长（毫秒）。指定负数则使用 DefaultDelay</param>
+        public static void ShowOk(Component controlOrItem, string text = null, int delay = -1)
+        {
+            Show(controlOrItem, text, _iconOk, delay);
+        }
+
+        /// <summary>
         /// 显示良好消息，图标为绿勾 √
         /// </summary>
         /// <param name="text">消息文本</param>
         /// <param name="delay">消息停留时长（毫秒）。指定负数则使用 DefaultDelay</param>
-        public static void ShowOk(string text = null, int delay = -1)
+        /// <param name="point">指定显示位置</param>
+        public static void ShowOk(string text = null, int delay = -1, Point? point = null)
         {
-            Show(text, _iconOk, delay);
+            Show(text, _iconOk, delay, point);
+        }
+
+        /// <summary>
+        /// 在指定控件附近显示警告消息，图标为黄色感叹号 ！
+        /// </summary>
+        /// <param name="controlOrItem">控件或工具栏项</param>
+        /// <param name="text">消息文本</param>
+        /// <param name="delay">消息停留时长（毫秒）。指定负数则使用 DefaultDelay</param>
+        public static void ShowWarning(Component controlOrItem, string text = null, int delay = -1)
+        {
+            Show(controlOrItem, text, _iconWarning, delay);
         }
 
         /// <summary>
@@ -63,9 +88,21 @@ namespace AhDung.WinForm
         /// </summary>
         /// <param name="text">消息文本</param>
         /// <param name="delay">消息停留时长（毫秒）。指定负数则使用 DefaultDelay</param>
-        public static void ShowWarning(string text = null, int delay = -1)
+        /// <param name="point">指定显示位置</param>
+        public static void ShowWarning(string text = null, int delay = -1, Point? point = null)
         {
-            Show(text, _iconWarning, delay);
+            Show(text, _iconWarning, delay, point);
+        }
+
+        /// <summary>
+        /// 在指定控件附近显示出错消息，图标为红叉 X
+        /// </summary>
+        /// <param name="controlOrItem">控件或工具栏项</param>
+        /// <param name="text">消息文本</param>
+        /// <param name="delay">消息停留时长（毫秒）。指定负数则使用 DefaultDelay</param>
+        public static void ShowError(Component controlOrItem, string text = null, int delay = -1)
+        {
+            Show(controlOrItem, text, _iconError, delay);
         }
 
         /// <summary>
@@ -73,32 +110,113 @@ namespace AhDung.WinForm
         /// </summary>
         /// <param name="text">消息文本</param>
         /// <param name="delay">消息停留时长（毫秒）。指定负数则使用 DefaultDelay</param>
-        public static void ShowError(string text = null, int delay = -1)
+        /// <param name="point">指定显示位置</param>
+        public static void ShowError(string text = null, int delay = -1, Point? point = null)
         {
-            Show(text, _iconError, delay);
+            Show(text, _iconError, delay, point);
+        }
+
+        /// <summary>
+        /// 在指定控件附近显示消息
+        /// </summary>
+        /// <param name="controlOrItem">控件或工具栏项</param>
+        /// <param name="text">消息文本</param>
+        /// <param name="icon">图标</param>
+        /// <param name="delay">消息停留时长（毫秒）。指定负数则使用 DefaultDelay</param>
+        public static void Show(Component controlOrItem, string text, Image icon = null, int delay = -1)
+        {
+            if (controlOrItem == null)
+            {
+                throw new ArgumentNullException("controlOrItem");
+            }
+            Show(text, icon, delay, GetCenterPosition(controlOrItem));
         }
 
         /// <summary>
         /// 显示消息
         /// </summary>
         /// <param name="text">消息文本</param>
-        /// <param name="icon">图标。不会进行缩放</param>
+        /// <param name="icon">图标</param>
         /// <param name="delay">消息停留时长（毫秒）。指定负数则使用 DefaultDelay</param>
-        public static void Show(string text, Image icon, int delay = -1)
+        /// <param name="point">指定显示位置。为null则按活动控件</param>
+        public static void Show(string text, Image icon = null, int delay = -1, Point? point = null)
         {
+            if (point == null)
+            {
+                //确定基准点
+                var focusControl = Control.FromHandle(NativeMethods.GetFocus());
+
+                if (focusControl is TextBoxBase)//若焦点在文本框内，则在光标附近显示
+                {
+                    point = GetTextBoxCursorPosition((TextBoxBase)focusControl);
+                }
+                else if (focusControl is ButtonBase)//若焦点在按钮，则在按钮附近显示
+                {
+                    point = GetCenterPosition(focusControl);
+                }
+                else //其余情况在鼠标附近显示
+                {
+                    point = Control.MousePosition;
+                }
+            }
+
+            //异步Show
             ThreadPool.QueueUserWorkItem(obj => new TipForm
             {
                 TipText = text,
                 TipIcon = icon,
                 Delay = delay < 0 ? DefaultDelay : delay,
                 Floating = AllowFloating,
-                BasePoint = Control.MousePosition //在鼠标点击的附近弹出
+                BasePoint = point.Value
             }.ShowDialog());//要让创建浮动窗体的线程具有消息循环，所以要用ShowDialog
         }
 
         /// <summary>
+        /// 获取控件中心点的屏幕坐标
+        /// </summary>
+        private static Point GetCenterPosition(Component controlOrItem)
+        {
+            Control c = controlOrItem as Control;
+            if (c != null)
+            {
+                return c.PointToScreen(new Point(c.Width / 2, c.Height / 2));
+            }
+            var item = controlOrItem as ToolStripItem;
+            if (item != null)
+            {
+                var pos = item.Bounds.Location;
+                pos.X += item.Width / 2;
+                pos.Y += item.Height / 2;
+                return item.Owner.PointToScreen(pos);
+            }
+            throw new ArgumentException();
+        }
+
+        /// <summary>
+        /// 获取文本框光标位置（近似），屏幕坐标
+        /// </summary>
+        private static Point GetTextBoxCursorPosition(TextBoxBase txb)
+        {
+            if (txb.SelectionStart == 0)
+            {
+                return txb.PointToScreen(Point.Empty);
+            }
+
+            int index = txb.SelectionStart;
+            if (index == txb.TextLength)
+            {
+                index--;//下面的API在光标处于最末时返回的是-1，有点扯，所以取倒数第2的光标位
+            }
+
+            var i = (int)NativeMethods.SendMessage(txb.Handle, 0xD6/*EM_POSFROMCHAR*/, (IntPtr)index, IntPtr.Zero);
+            return txb.PointToScreen(new Point(i & 0xFFFF, (i >> 16) & 0xFFFF));
+        }
+
+
+        /// <summary>
         /// 内置图标数据：√ ! X
         /// </summary>
+        /// <remarks>GIF文件</remarks>
         const string DefaultIconData = @"R0lGODlhYAAgANUAAOrcJ9LORebm5tJKShPLJLczM/z3s/XrkNfSOhS2JKaYMezeaMoREfhwcNS3
 t7IREVSkWpWQZjCpPfz8+zS4RN3PZdTU1EjLWG9uaO/w7/Dke1HVYfHsx5UzM8Q8PLjYuqmmn8bl
 yeO3txsbD+fck9DAUeDaVV1cHuHXMDGTOO3iSeHy4+BYWDvGTPn25O/hN5PIl8K1Pbfhu/z78nW/
@@ -134,6 +252,11 @@ MUEPCkQu+eSUV255DwrrS65Kum4eyRJNAy304aSXXrriTk8wOgg4gIB22okbjjbrICC9E/jnuEcR
             const int IconTextSpacing = 3;
 
             /// <summary>
+            /// 是否向下浮动
+            /// </summary>
+            bool _floatDown;
+
+            /// <summary>
             /// 基准点。用于指导本窗体显示位置
             /// </summary>
             public Point BasePoint { get; set; }
@@ -141,7 +264,13 @@ MUEPCkQu+eSUV255DwrrS65Kum4eyRJNAy304aSXXrriTk8wOgg4gIB22okbjjbrICC9E/jnuEcR
             /// <summary>
             /// 提示图标
             /// </summary>
-            public Image TipIcon { get; set; }
+            public Image TipIcon
+            {
+                //有零星反映访问TipIcon会抛异常，姑且看看独占后能否解决
+                [MethodImpl(MethodImplOptions.Synchronized)]
+                get;
+                set;
+            }
 
             string _tipText;
             /// <summary>
@@ -219,44 +348,57 @@ MUEPCkQu+eSUV255DwrrS65Kum4eyRJNAy304aSXXrriTk8wOgg4gIB22okbjjbrICC9E/jnuEcR
                 var p = BasePoint;
                 p.X -= this.Width / 2;
 
+                //以基准点所在屏幕为界
+                var screen = Screen.FromPoint(BasePoint).Bounds;
+
                 //横向处理。距离屏幕左右两边太近时的处理
-                int screenWidth;
-                if (p.X < 10)
+                //多屏下left可能为负，所以right = width - (-left) = width + left
+                int dist = 10; //至少距离边缘多少像素
+                int right;
+                if (p.X < screen.Left + dist)
                 {
-                    p.X = 10;
+                    p.X = screen.Left + dist;
                 }
-                else if (p.X + this.Width > (screenWidth = Screen.PrimaryScreen.Bounds.Width) - 10)
+                else if (p.X + this.Width > (right = screen.Width + screen.Left) - dist)
                 {
-                    p.X = screenWidth - 10 - this.Width;
+                    p.X = right - dist - this.Width;
                 }
 
-                //纵向处理。在鼠标上方显示
-                p.Y -= this.Height + 20;
+                //纵向处理。默认在上方显示
+                dist = 20;//错开基准点上下20像素
+                p.Y -= this.Height + dist;
+                if (p.Y < screen.Top + 50)//若太靠屏幕上方，往下显示
+                {
+                    p.Y += this.Height + 2 * dist;
+                    _floatDown = true;
+                }
 
                 this.Location = p;
             }
 
             void TipForm_Load(object sender, EventArgs e)
             {
+                //这俩顺序不能乱
                 ProcessClientSize();
                 ProcessLocation();
 
-                //上浮窗体动画。采用异步，以不阻塞透明渐变动画的进行
+                //浮动动画。采用异步，以不阻塞透明渐变动画的进行
                 if (Floating)
                 {
-                    ThreadPool.QueueUserWorkItem(obj =>
+                    new Thread(() => //用线程池偶尔会忙不过来
                     {
+                        int adj = _floatDown ? 1 : -1;
                         while (this.IsHandleCreated)
                         {
                             this.BeginInvoke(new Action<object>(arg =>
                             {
-                                this.Top--;
+                                this.Top += adj;
                                 Application.DoEvents();
                             }), (object)null);
 
                             Thread.Sleep(30);
                         }
-                    });
+                    }) { IsBackground = true }.Start();
                 }
 
                 //透明渐入动画。之所以不用异步是为了在完全显示后再开始Delay的计时
@@ -307,7 +449,6 @@ MUEPCkQu+eSUV255DwrrS65Kum4eyRJNAy304aSXXrriTk8wOgg4gIB22okbjjbrICC9E/jnuEcR
 
                 var clip = GetPaddedRectangle();//得到作图区域
                 var g = e.Graphics;
-                //g.DrawRectangle(Pens.Red, clip);//debug
 
                 //画图标
                 if (TipIcon != null)
@@ -352,7 +493,7 @@ MUEPCkQu+eSUV255DwrrS65Kum4eyRJNAy304aSXXrriTk8wOgg4gIB22okbjjbrICC9E/jnuEcR
             {
                 if (disposing)
                 {
-                    _timer.Dispose();//这货必须显示释放
+                    _timer.Dispose();//注意释放这货
                 }
                 base.Dispose(disposing);
             }
@@ -363,7 +504,6 @@ MUEPCkQu+eSUV255DwrrS65Kum4eyRJNAy304aSXXrriTk8wOgg4gIB22okbjjbrICC9E/jnuEcR
                 this.SuspendLayout();
 
                 this.AutoScaleMode = AutoScaleMode.None;
-                //this.ClientSize = new System.Drawing.Size(100, 100);
                 this.BackColor = Color.White;
                 this.Font = new Font(SystemFonts.MessageBoxFont.FontFamily, 12);
                 this.FormBorderStyle = FormBorderStyle.None;
@@ -379,5 +519,16 @@ MUEPCkQu+eSUV255DwrrS65Kum4eyRJNAy304aSXXrriTk8wOgg4gIB22okbjjbrICC9E/jnuEcR
             #endregion
         }
 
+        /// <summary>
+        /// Win32 API
+        /// </summary>
+        private static class NativeMethods
+        {
+            [DllImport("user32.dll", CharSet = CharSet.Auto)]
+            public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
+            [DllImport("user32.dll")]
+            public static extern IntPtr GetFocus();
+        }
     }
 }

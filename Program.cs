@@ -13,7 +13,7 @@ namespace AhDung
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FmTester());
+            Application.Run(new FmMDI());
         }
     }
 }

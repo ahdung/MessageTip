@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FmMDI));
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.btnNewChild = new System.Windows.Forms.ToolStripButton();
             this.btnNewForm = new System.Windows.Forms.ToolStripButton();
@@ -55,7 +54,7 @@
             // 
             // btnNewChild
             // 
-            this.btnNewChild.Image = ((System.Drawing.Image)(resources.GetObject("btnNewChild.Image")));
+            this.btnNewChild.Image = global::AhDung.Properties.Resources.PicDemo;
             this.btnNewChild.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnNewChild.Name = "btnNewChild";
             this.btnNewChild.Size = new System.Drawing.Size(117, 22);
@@ -64,7 +63,7 @@
             // 
             // btnNewForm
             // 
-            this.btnNewForm.Image = ((System.Drawing.Image)(resources.GetObject("btnNewForm.Image")));
+            this.btnNewForm.Image = global::AhDung.Properties.Resources.PicDemo;
             this.btnNewForm.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnNewForm.Name = "btnNewForm";
             this.btnNewForm.Size = new System.Drawing.Size(132, 22);
@@ -73,7 +72,7 @@
             // 
             // btnTestItem
             // 
-            this.btnTestItem.Image = ((System.Drawing.Image)(resources.GetObject("btnTestItem.Image")));
+            this.btnTestItem.Image = global::AhDung.Properties.Resources.PicDemo;
             this.btnTestItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnTestItem.Name = "btnTestItem";
             this.btnTestItem.Size = new System.Drawing.Size(177, 22);

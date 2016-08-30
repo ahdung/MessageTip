@@ -120,32 +120,4 @@
   <metadata name="toolStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="btnNewChild.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACqSURBVDhPpY/BDcMgEASpJoX4lXrycgVpxI804U868NfK
-        Mw24ACdYg7QRkAMjG2nFHdqdO5w/eQLgPsxFXW/PohLA+vk2aXotQZeubwNg1sTH+A49dzOAICF95xBA
-        YW1B3wTQNIIE9IUqAIOmUecyN8AchzEhTDKrrgIUjifFQOdcuHn7A5TCMtMjIOYGeTgHIPVATIAVRgLk
-        SgAKWpNLSgCWYU8/wPHj/QZPoiLLEhIY7QAAAABJRU5ErkJggg==
-</value>
-  </data>
-  <data name="btnNewForm.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACqSURBVDhPpY/BDcMgEASpJoX4lXrycgVpxI804U868NfK
-        Mw24ACdYg7QRkAMjG2nFHdqdO5w/eQLgPsxFXW/PohLA+vk2aXotQZeubwNg1sTH+A49dzOAICF95xBA
-        YW1B3wTQNIIE9IUqAIOmUecyN8AchzEhTDKrrgIUjifFQOdcuHn7A5TCMtMjIOYGeTgHIPVATIAVRgLk
-        SgAKWpNLSgCWYU8/wPHj/QZPoiLLEhIY7QAAAABJRU5ErkJggg==
-</value>
-  </data>
-  <data name="btnTestItem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACqSURBVDhPpY/BDcMgEASpJoX4lXrycgVpxI804U868NfK
-        Mw24ACdYg7QRkAMjG2nFHdqdO5w/eQLgPsxFXW/PohLA+vk2aXotQZeubwNg1sTH+A49dzOAICF95xBA
-        YW1B3wTQNIIE9IUqAIOmUecyN8AchzEhTDKrrgIUjifFQOdcuHn7A5TCMtMjIOYGeTgHIPVATIAVRgLk
-        SgAKWpNLSgCWYU8/wPHj/QZPoiLLEhIY7QAAAABJRU5ErkJggg==
-</value>
-  </data>
 </root>

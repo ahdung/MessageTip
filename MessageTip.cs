@@ -197,12 +197,12 @@ namespace AhDung.WinForm
         /// </summary>
         private static Point GetTextBoxCursorPosition(TextBoxBase txb)
         {
-            if (txb.SelectionStart == 0)
+            int index = txb.SelectionStart;
+            if (index == 0)
             {
                 return txb.PointToScreen(Point.Empty);
             }
 
-            int index = txb.SelectionStart;
             if (index == txb.TextLength)
             {
                 index--;//下面的API在光标处于最末时返回的是-1，有点扯，所以取倒数第2的光标位
@@ -331,7 +331,7 @@ MUEPCkQu+eSUV255DwrrS65Kum4eyRJNAy304aSXXrriTk8wOgg4gIB22okbjjbrICC9E/jnuEcR
                 {
                     if (TipIcon != null)
                     {
-                        size.Width += IconTextSpacing;//图标与文字的间距
+                        size.Width += IconTextSpacing;
                     }
                     var textSize = TextRenderer.MeasureText(TipText, this.Font);
                     size.Width += textSize.Width;
@@ -348,7 +348,7 @@ MUEPCkQu+eSUV255DwrrS65Kum4eyRJNAy304aSXXrriTk8wOgg4gIB22okbjjbrICC9E/jnuEcR
                 var p = BasePoint;
                 p.X -= this.Width / 2;
 
-                //以基准点所在屏幕为界
+                //以基准点所在屏为界
                 var screen = Screen.FromPoint(BasePoint).Bounds;
 
                 //横向处理。距离屏幕左右两边太近时的处理
@@ -370,7 +370,7 @@ MUEPCkQu+eSUV255DwrrS65Kum4eyRJNAy304aSXXrriTk8wOgg4gIB22okbjjbrICC9E/jnuEcR
                 if (p.Y < screen.Top + 50)//若太靠屏幕上方，往下显示
                 {
                     p.Y += this.Height + 2 * dist;
-                    _floatDown = true;
+                    _floatDown = true;//动画改为下降
                 }
 
                 this.Location = p;
@@ -414,7 +414,7 @@ MUEPCkQu+eSUV255DwrrS65Kum4eyRJNAy304aSXXrriTk8wOgg4gIB22okbjjbrICC9E/jnuEcR
 
             void TipForm_Shown(object sender, EventArgs e)
             {
-                //因为timer.Interval不能为0
+                //timer.Interval不能为0
                 if (Delay > 0)
                 {
                     _timer.Interval = Delay;

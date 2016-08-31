@@ -44,9 +44,15 @@ namespace AhDung.WinForm
 
             using (spriteImage)
             {
-                _iconOk = spriteImage.Clone(new Rectangle(0, 0, 32, 32), spriteImage.PixelFormat);
-                _iconWarning = spriteImage.Clone(new RectangleF(32, 0, 32, 32), spriteImage.PixelFormat);
-                _iconError = spriteImage.Clone(new RectangleF(64, 0, 32, 32), spriteImage.PixelFormat);
+#if SmallSize
+                const int imageSize = 24;
+#else
+                const int imageSize = 32;
+#endif
+
+                _iconOk = spriteImage.Clone(new Rectangle(0, 0, imageSize, imageSize), spriteImage.PixelFormat);
+                _iconWarning = spriteImage.Clone(new RectangleF(imageSize, 0, imageSize, imageSize), spriteImage.PixelFormat);
+                _iconError = spriteImage.Clone(new RectangleF(2 * imageSize, 0, imageSize, imageSize), spriteImage.PixelFormat);
             }
         }
 
@@ -146,11 +152,13 @@ namespace AhDung.WinForm
                 //确定基准点
                 var focusControl = Control.FromHandle(NativeMethods.GetFocus());
 
-                if (focusControl is TextBoxBase)//若焦点在文本框内，则在光标附近显示
+                if (focusControl is TextBoxBase)//若焦点是文本框，取光标位置
                 {
-                    point = GetTextBoxCursorPosition((TextBoxBase)focusControl);
+                    var pt = GetCaretPosition();
+                    pt.Y += focusControl.Font.Height / 2;
+                    point = focusControl.PointToScreen(pt);
                 }
-                else if (focusControl is ButtonBase)//若焦点在按钮，则在按钮附近显示
+                else if (focusControl is ButtonBase)//若焦点是按钮，取按钮中心点
                 {
                     point = GetCenterPosition(focusControl);
                 }
@@ -193,31 +201,35 @@ namespace AhDung.WinForm
         }
 
         /// <summary>
-        /// 获取文本框光标位置（近似），屏幕坐标
+        /// 获取输入光标位置，文本框内坐标
         /// </summary>
-        private static Point GetTextBoxCursorPosition(TextBoxBase txb)
+        private static Point GetCaretPosition()
         {
-            int index = txb.SelectionStart;
-            if (index == 0)
-            {
-                return txb.PointToScreen(Point.Empty);
-            }
-
-            if (index == txb.TextLength)
-            {
-                index--;//下面的API在光标处于最末时返回的是-1，有点扯，所以取倒数第2的光标位
-            }
-
-            var i = (int)NativeMethods.SendMessage(txb.Handle, 0xD6/*EM_POSFROMCHAR*/, (IntPtr)index, IntPtr.Zero);
-            return txb.PointToScreen(new Point(i & 0xFFFF, (i >> 16) & 0xFFFF));
+            Point pt;
+            NativeMethods.GetCaretPos(out pt);
+            return pt;
         }
-
 
         /// <summary>
         /// 内置图标数据：√ ! X
         /// </summary>
         /// <remarks>GIF文件</remarks>
-        const string DefaultIconData = @"R0lGODlhYAAgANUAAOrcJ9LORebm5tJKShPLJLczM/z3s/XrkNfSOhS2JKaYMezeaMoREfhwcNS3
+        const string DefaultIconData =
+#if SmallSize
+ @"R0lGODlhSAAYAMQAAOjbK9eZmejy4uVdXSUkELHetssRESmbM1XYZfPqk9XHZdbROrk1NcSZmfbx
+vhbFJqeXMmtrWzawRPPkdODTaLMSEoozM8u9St/WTr+0LuDXm0vGWdy3t4nFjqETE////ywAAAAA
+SAAYAAAF/+AnjmRpnmiqrmzrviPHBGzAcHApSEXrYAoHSzaYqWxFXO4j2CB4LEoiQVkRB0XaCYm9
+LZ2IZy/loDjKwhQDyzaWuO1cBxyWqKRT6nFd7GpFXHxuLgUSYXVjJ1QOCRNlCXt9a25IDJODLYVh
+GxsSHSoKUxMTUworlZZZqJaYLDtOnBIbKhpSGhERoRQap5esv6x/La9PDxISAikCGKW4GqQKyZHA
+wMIkhZ8lnRsH3QfSKLWNCrgKpBi8Kw3Uv9Yjmp4kHYYHD92JJwIXjRPkuRSkLqRRsc5SBQ8IGTRA
+Ae9Jtg4HENTrli0FBSkTLhIgcGHBAgoK0h2xwAChSQvuRP8YOkavw7xi3WapcLBvAgYMFzYu6PhR
+IEGSB00iRHkCIoJODzod2PCg6QFkKxQAxOBxAYQIVRcAMYWiYIWDXz18rWBhoYl5TJs+KGbv2wqa
+CahWHZVVq08TDSyM/WpB716iZ5eqHXwAHwqpcj1m2JgBQFUAF7iSyGvgb4MAfitULlu03mB7FVNo
+uDABgGnTEDZGOO0YssgPlA3INsAZtgXZmmmbLQGRcOgUFzCwRs14uOMLI2LPri1CuWzm8jzbAyc6
+g3Djo4ybzpDu9mzdeL0vR9E7AvUUEK5rX+8YgggO4qFPjq+ks2HREPLr38+fv0j44KVAmQX1LWFg
+C/DtJiAIgQc26CALIQAAOw=="
+#else
+ @"R0lGODlhYAAgANUAAOrcJ9LORebm5tJKShPLJLczM/z3s/XrkNfSOhS2JKaYMezeaMoREfhwcNS3
 t7IREVSkWpWQZjCpPfz8+zS4RN3PZdTU1EjLWG9uaO/w7/Dke1HVYfHsx5UzM8Q8PLjYuqmmn8bl
 yeO3txsbD+fck9DAUeDaVV1cHuHXMDGTOO3iSeHy4+BYWDvGTPn25O/hN5PIl8K1Pbfhu/z78nW/
 fPb39lbeZ5/WpIAzM2HpcqITExGiIjV/N8S9luLbqf///yH5BAAAAAAALAAAAABgACAAAAb/wJ9w
@@ -239,7 +251,9 @@ GIvsDhDg+1kM7gLgMLwPR0BcBA8/jMLDMaQmRLYCh0vwvxx3jIMSBiMKwZGqxmDCCxW3rIIsKrTc
 MgIxmKivyKGC3PHAOf8wQQ0ZZCAACObyYIEAQWdQw9ITNH2EDwzLLPXUFWc8xM37fnwE1h73/APQ
 AlggNgg88NCD2EcLgLTSThtB6wsqvCD33HIDwDLLVDsc678dZO11EZl2jcTPQattuNpJK11D020T
 MUEPCkQu+eSUV255DwrrS65Kum4eyRJNAy304aSXXrriTk8wOgg4gIB22okbjjbrICC9E/jnuEcR
-+uiHB73076KT7rvTQQAAOw==";
++uiHB73076KT7rvTQQAAOw=="
+#endif
+;
 
         /// <summary>
         /// 浮动消息层
@@ -359,9 +373,9 @@ MUEPCkQu+eSUV255DwrrS65Kum4eyRJNAy304aSXXrriTk8wOgg4gIB22okbjjbrICC9E/jnuEcR
                 {
                     p.X = left;
                 }
-                else if (p.X + this.Width > (right = screen.Width + screen.Left - dist))
+                else if (p.X > (right = screen.Width + screen.Left - dist - this.Width))
                 {
-                    p.X = right - this.Width;
+                    p.X = right;
                 }
 
                 //纵向处理。默认在上方显示
@@ -505,9 +519,14 @@ MUEPCkQu+eSUV255DwrrS65Kum4eyRJNAy304aSXXrriTk8wOgg4gIB22okbjjbrICC9E/jnuEcR
 
                 this.AutoScaleMode = AutoScaleMode.None;
                 this.BackColor = Color.White;
+#if SmallSize
+                this.Font = SystemFonts.MessageBoxFont;
+                this.Padding = new Padding(10, 5, 10, 5);
+#else
                 this.Font = new Font(SystemFonts.MessageBoxFont.FontFamily, 12);
-                this.FormBorderStyle = FormBorderStyle.None;
                 this.Padding = new Padding(20, 10, 20, 10);
+#endif
+                this.FormBorderStyle = FormBorderStyle.None;
                 this.Name = "TipForm";
                 this.ShowInTaskbar = false;
 
@@ -524,8 +543,8 @@ MUEPCkQu+eSUV255DwrrS65Kum4eyRJNAy304aSXXrriTk8wOgg4gIB22okbjjbrICC9E/jnuEcR
         /// </summary>
         private static class NativeMethods
         {
-            [DllImport("user32.dll", CharSet = CharSet.Auto)]
-            public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+            [DllImport("User32.dll", SetLastError = true)]
+            public static extern bool GetCaretPos(out Point pt);
 
             [DllImport("user32.dll")]
             public static extern IntPtr GetFocus();

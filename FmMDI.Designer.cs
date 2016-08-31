@@ -33,9 +33,9 @@
             this.btnNewForm = new System.Windows.Forms.ToolStripButton();
             this.btnTestItem = new System.Windows.Forms.ToolStripButton();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.label1 = new System.Windows.Forms.Label();
-            this.txbText = new System.Windows.Forms.TextBox();
             this.btnShow = new System.Windows.Forms.Button();
+            this.txbText = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.toolStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -90,26 +90,6 @@
             this.panel1.Size = new System.Drawing.Size(722, 47);
             this.panel1.TabIndex = 1;
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(14, 16);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(29, 12);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Text";
-            // 
-            // txbText
-            // 
-            this.txbText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txbText.Location = new System.Drawing.Point(49, 13);
-            this.txbText.Name = "txbText";
-            this.txbText.Size = new System.Drawing.Size(580, 21);
-            this.txbText.TabIndex = 0;
-            this.txbText.Text = "Try press Enter key";
-            this.txbText.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txbText_KeyDown);
-            // 
             // btnShow
             // 
             this.btnShow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -120,6 +100,27 @@
             this.btnShow.Text = "Show";
             this.btnShow.UseVisualStyleBackColor = true;
             this.btnShow.Click += new System.EventHandler(this.btnShow_Click);
+            // 
+            // txbText
+            // 
+            this.txbText.AcceptsReturn = true;
+            this.txbText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txbText.Location = new System.Drawing.Point(49, 13);
+            this.txbText.Name = "txbText";
+            this.txbText.Size = new System.Drawing.Size(580, 21);
+            this.txbText.TabIndex = 0;
+            this.txbText.Text = "Try press Enter key";
+            this.txbText.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txbText_KeyDown);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(14, 16);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(29, 12);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Text";
             // 
             // FmMDI
             // 

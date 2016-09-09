@@ -41,17 +41,20 @@ namespace AhDung
 
         private void btnOk_Click(object sender, EventArgs e)
         {
-            MessageTip.ShowOk(txbText.Text);
+            //MessageTip.ShowOk(txbText.Text);
+            MessageTip.Show(txbText.Text, TipIcon.Ok);
         }
 
         private void btnWarning_Click(object sender, EventArgs e)
         {
-            MessageTip.ShowWarning(txbText.Text);
+            //MessageTip.ShowWarning(txbText.Text);
+            MessageTip.Show(txbText.Text, TipIcon.Warning);
         }
 
         private void btnError_Click(object sender, EventArgs e)
         {
-            MessageTip.ShowError(txbText.Text);
+            //MessageTip.ShowError(txbText.Text);
+            MessageTip.Show(txbText.Text, TipIcon.Error);
         }
 
         private void btnShow_Click(object sender, EventArgs e)

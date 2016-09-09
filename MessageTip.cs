@@ -10,13 +10,37 @@ using System.Windows.Forms;
 namespace AhDung.WinForm
 {
     /// <summary>
+    /// 内置图标枚举
+    /// </summary>
+    public enum TipIcon
+    {
+        /// <summary>
+        /// 无图标
+        /// </summary>
+        None,
+        /// <summary>
+        /// 良好。绿勾 √
+        /// </summary>
+        Ok,
+        /// <summary>
+        /// 警告。黄色感叹号 ！
+        /// </summary>
+        Warning,
+        /// <summary>
+        /// 错误。红叉 ×
+        /// </summary>
+        Error
+    }
+
+    /// <summary>
     /// 轻快型消息框
     /// </summary>
     public static class MessageTip
     {
-        static readonly Image _iconOk;
-        static readonly Image _iconWarning;
-        static readonly Image _iconError;
+        /// <summary>
+        /// 内置图标数组，顺序与TipIcon枚举对应
+        /// </summary>
+        static readonly Image[] _icons;
 
         /// <summary>
         /// 全局停留时长（毫秒），影响后续弹出的tip。默认500
@@ -49,77 +73,93 @@ namespace AhDung.WinForm
 #else
                 const int imageSize = 32;
 #endif
-
-                _iconOk = spriteImage.Clone(new Rectangle(0, 0, imageSize, imageSize), spriteImage.PixelFormat);
-                _iconWarning = spriteImage.Clone(new RectangleF(imageSize, 0, imageSize, imageSize), spriteImage.PixelFormat);
-                _iconError = spriteImage.Clone(new RectangleF(2 * imageSize, 0, imageSize, imageSize), spriteImage.PixelFormat);
+                _icons = new Image[4]; //[0]=null
+                _icons[1] = spriteImage.Clone(new Rectangle(0, 0, imageSize, imageSize), spriteImage.PixelFormat);
+                _icons[2] = spriteImage.Clone(new RectangleF(imageSize, 0, imageSize, imageSize), spriteImage.PixelFormat);
+                _icons[3] = spriteImage.Clone(new RectangleF(2 * imageSize, 0, imageSize, imageSize), spriteImage.PixelFormat);
             }
         }
 
         /// <summary>
-        /// 在指定控件附近显示良好消息，图标为绿勾 √
+        /// 在指定控件附近显示良好消息，图标为绿勾 √。与传入TipIcon.Ok等价
         /// </summary>
         /// <param name="controlOrItem">控件或工具栏项</param>
         /// <param name="text">消息文本</param>
         /// <param name="delay">消息停留时长（毫秒）。指定负数则使用 DefaultDelay</param>
         public static void ShowOk(Component controlOrItem, string text = null, int delay = -1)
         {
-            Show(controlOrItem, text, _iconOk, delay);
+            Show(controlOrItem, text, _icons[1], delay);
         }
 
         /// <summary>
-        /// 显示良好消息，图标为绿勾 √
+        /// 显示良好消息，图标为绿勾 √。与传入TipIcon.Ok等价
         /// </summary>
         /// <param name="text">消息文本</param>
         /// <param name="delay">消息停留时长（毫秒）。指定负数则使用 DefaultDelay</param>
         /// <param name="point">指定显示位置</param>
         public static void ShowOk(string text = null, int delay = -1, Point? point = null)
         {
-            Show(text, _iconOk, delay, point);
+            Show(text, _icons[1], delay, point);
         }
 
         /// <summary>
-        /// 在指定控件附近显示警告消息，图标为黄色感叹号 ！
+        /// 在指定控件附近显示警告消息，图标为黄色感叹号 ！。与传入TipIcon.Warning等价
         /// </summary>
         /// <param name="controlOrItem">控件或工具栏项</param>
         /// <param name="text">消息文本</param>
         /// <param name="delay">消息停留时长（毫秒）。指定负数则使用 DefaultDelay</param>
         public static void ShowWarning(Component controlOrItem, string text = null, int delay = -1)
         {
-            Show(controlOrItem, text, _iconWarning, delay);
+            Show(controlOrItem, text, _icons[2], delay);
         }
 
         /// <summary>
-        /// 显示警告消息，图标为黄色感叹号 ！
+        /// 显示警告消息，图标为黄色感叹号 ！。与传入TipIcon.Warning等价
         /// </summary>
         /// <param name="text">消息文本</param>
         /// <param name="delay">消息停留时长（毫秒）。指定负数则使用 DefaultDelay</param>
         /// <param name="point">指定显示位置</param>
         public static void ShowWarning(string text = null, int delay = -1, Point? point = null)
         {
-            Show(text, _iconWarning, delay, point);
+            Show(text, _icons[2], delay, point);
         }
 
         /// <summary>
-        /// 在指定控件附近显示出错消息，图标为红叉 X
+        /// 在指定控件附近显示出错消息，图标为红叉 X。与传入TipIcon.Error等价
         /// </summary>
         /// <param name="controlOrItem">控件或工具栏项</param>
         /// <param name="text">消息文本</param>
         /// <param name="delay">消息停留时长（毫秒）。指定负数则使用 DefaultDelay</param>
         public static void ShowError(Component controlOrItem, string text = null, int delay = -1)
         {
-            Show(controlOrItem, text, _iconError, delay);
+            Show(controlOrItem, text, _icons[3], delay);
         }
 
         /// <summary>
-        /// 显示出错消息，图标为红叉 X
+        /// 显示出错消息，图标为红叉 X。与传入TipIcon.Error等价
         /// </summary>
         /// <param name="text">消息文本</param>
         /// <param name="delay">消息停留时长（毫秒）。指定负数则使用 DefaultDelay</param>
         /// <param name="point">指定显示位置</param>
         public static void ShowError(string text = null, int delay = -1, Point? point = null)
         {
-            Show(text, _iconError, delay, point);
+            Show(text, _icons[3], delay, point);
+        }
+
+        /// <summary>
+        /// 在指定控件附近显示消息
+        /// </summary>
+        /// <param name="controlOrItem">控件或工具栏项</param>
+        /// <param name="text">消息文本</param>
+        /// <param name="tipIcon">内置图标</param>
+        /// <param name="delay">消息停留时长（毫秒）。指定负数则使用 DefaultDelay</param>
+        public static void Show(Component controlOrItem, string text, TipIcon tipIcon = TipIcon.None, int delay = -1)
+        {
+            if (controlOrItem == null)
+            {
+                throw new ArgumentNullException("controlOrItem");
+            }
+            Show(text, _icons[(int)tipIcon], delay, GetCenterPosition(controlOrItem));
         }
 
         /// <summary>
@@ -129,7 +169,7 @@ namespace AhDung.WinForm
         /// <param name="text">消息文本</param>
         /// <param name="icon">图标</param>
         /// <param name="delay">消息停留时长（毫秒）。指定负数则使用 DefaultDelay</param>
-        public static void Show(Component controlOrItem, string text, Image icon = null, int delay = -1)
+        public static void Show(Component controlOrItem, string text, Image icon, int delay = -1)
         {
             if (controlOrItem == null)
             {
@@ -142,10 +182,22 @@ namespace AhDung.WinForm
         /// 显示消息
         /// </summary>
         /// <param name="text">消息文本</param>
+        /// <param name="tipIcon">内置图标</param>
+        /// <param name="delay">消息停留时长（毫秒）。指定负数则使用 DefaultDelay</param>
+        /// <param name="point">指定显示位置。为null则按活动控件</param>
+        public static void Show(string text, TipIcon tipIcon = TipIcon.None, int delay = -1, Point? point = null)
+        {
+            Show(text, _icons[(int)tipIcon], delay, point);
+        }
+
+        /// <summary>
+        /// 显示消息
+        /// </summary>
+        /// <param name="text">消息文本</param>
         /// <param name="icon">图标</param>
         /// <param name="delay">消息停留时长（毫秒）。指定负数则使用 DefaultDelay</param>
         /// <param name="point">指定显示位置。为null则按活动控件</param>
-        public static void Show(string text, Image icon = null, int delay = -1, Point? point = null)
+        public static void Show(string text, Image icon, int delay = -1, Point? point = null)
         {
             if (point == null)
             {
@@ -220,14 +272,14 @@ namespace AhDung.WinForm
 vhbFJqeXMmtrWzawRPPkdODTaLMSEoozM8u9St/WTr+0LuDXm0vGWdy3t4nFjqETE////ywAAAAA
 SAAYAAAF/+AnjmRpnmiqrmzrviPHBGzAcHApSEXrYAoHSzaYqWxFXO4j2CB4LEoiQVkRB0XaCYm9
 LZ2IZy/loDjKwhQDyzaWuO1cBxyWqKRT6nFd7GpFXHxuLgUSYXVjJ1QOCRNlCXt9a25IDJODLYVh
-GxsSHSoKUxMTUworlZZZqJaYLDtOnBIbKhpSGhERoRQap5esv6x/La9PDxISAikCGKW4GqQKyZHA
-wMIkhZ8lnRsH3QfSKLWNCrgKpBi8Kw3Uv9Yjmp4kHYYHD92JJwIXjRPkuRSkLqRRsc5SBQ8IGTRA
-Ae9Jtg4HENTrli0FBSkTLhIgcGHBAgoK0h2xwAChSQvuRP8YOkavw7xi3WapcLBvAgYMFzYu6PhR
-IEGSB00iRHkCIoJODzod2PCg6QFkKxQAxOBxAYQIVRcAMYWiYIWDXz18rWBhoYl5TJs+KGbv2wqa
-CahWHZVVq08TDSyM/WpB716iZ5eqHXwAHwqpcj1m2JgBQFUAF7iSyGvgb4MAfitULlu03mB7FVNo
-uDABgGnTEDZGOO0YssgPlA3INsAZtgXZmmmbLQGRcOgUFzCwRs14uOMLI2LPri1CuWzm8jzbAyc6
-g3Djo4ybzpDu9mzdeL0vR9E7AvUUEK5rX+8YgggO4qFPjq+ks2HREPLr38+fv0j44KVAmQX1LWFg
-C/DtJiAIgQc26CALIQAAOw=="
+GxsSHSoKUxMTUworlZZZqJaYLDtOnBIbKhpSGhERoRQap5esv6x/La8IDw8SEgIpAhiluBqkCsqR
+wMDCJIWfJZ2dxwfTKLWNCrgKpBi8Kw3Vv9cjmp4kHYYH3oknAheNE+S5FKQX0qhYZ6mCh4MMGqCA
+90RbhwMI6kk4oC0FBSkTLhIgcGHBAgoK0h2xwOCgSQvuRP8YQkavw7wn3mapcKBvAgYMFzYu6Pgx
+4ECSBk0eRHniIYJunQ5sMPbgQLIVCv5h8LgAQgSqC4CYQkGwgkGvHrxWsKDQxLylTGE2/baCZoKp
+VEdhzerTRAMLYr1awJuXqFmlTAMfuIciKlyPGTZmAEAVwIWtJO4a6NsgAN8Kk8kWrRe4acUUGi5M
+AECaNISNEUozdizyg2QDsA1odm0BNmbZZUs8FPw5xQUMqk0rDs74wojXsWeLQA5buTzOTcGBzgCc
++CjipDOkqx0bt13uyVHsjiA9BYTq2NMzhiCCA3jnkd8r2UwYNIT7+PPr1y/SvfcUklkw3xIEtuBe
+bgAKWOAFggyyEAIAOw==";
 #else
  @"R0lGODlhYAAgANUAAOrcJ9LORebm5tJKShPLJLczM/z3s/XrkNfSOhS2JKaYMezeaMoREfhwcNS3
 t7IREVSkWpWQZjCpPfz8+zS4RN3PZdTU1EjLWG9uaO/w7/Dke1HVYfHsx5UzM8Q8PLjYuqmmn8bl
@@ -251,9 +303,8 @@ GIvsDhDg+1kM7gLgMLwPR0BcBA8/jMLDMaQmRLYCh0vwvxx3jIMSBiMKwZGqxmDCCxW3rIIsKrTc
 MgIxmKivyKGC3PHAOf8wQQ0ZZCAACObyYIEAQWdQw9ITNH2EDwzLLPXUFWc8xM37fnwE1h73/APQ
 AlggNgg88NCD2EcLgLTSThtB6wsqvCD33HIDwDLLVDsc678dZO11EZl2jcTPQattuNpJK11D020T
 MUEPCkQu+eSUV255DwrrS65Kum4eyRJNAy304aSXXrriTk8wOgg4gIB22okbjjbrICC9E/jnuEcR
-+uiHB73076KT7rvTQQAAOw=="
++uiHB73076KT7rvTQQAAOw==";
 #endif
-;
 
         /// <summary>
         /// 浮动消息层

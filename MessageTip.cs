@@ -159,8 +159,7 @@ namespace AhDung.WinForm
             {
                 throw new ArgumentNullException("controlOrItem");
             }
-
-            Show(text, _icons[CheckAndConvertTipIconValue(tipIcon)], delay, GetCenterPosition(controlOrItem));
+            Show(text, CheckAndConvertTipIconValue(tipIcon), delay, GetCenterPosition(controlOrItem));
         }
 
         /// <summary>
@@ -188,7 +187,7 @@ namespace AhDung.WinForm
         /// <param name="point">指定显示位置。为null则按活动控件</param>
         public static void Show(string text, TipIcon tipIcon = TipIcon.None, int delay = -1, Point? point = null)
         {
-            Show(text, _icons[CheckAndConvertTipIconValue(tipIcon)], delay, point);
+            Show(text, CheckAndConvertTipIconValue(tipIcon), delay, point);
         }
 
         /// <summary>
@@ -233,16 +232,16 @@ namespace AhDung.WinForm
         }
 
         /// <summary>
-        /// 检测枚举值合法性并转换为int
+        /// 检测枚举值合法性并转换为Image
         /// </summary>
-        private static int CheckAndConvertTipIconValue(TipIcon tipIcon)
+        private static Image CheckAndConvertTipIconValue(TipIcon tipIcon)
         {
             int i = (int)tipIcon;
             if (i < 0 || i > 3)
             {
                 throw new InvalidEnumArgumentException("tipIcon", i, typeof(TipIcon));
             }
-            return i;
+            return _icons[i];
         }
 
         /// <summary>

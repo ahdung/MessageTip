@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
@@ -57,26 +56,22 @@ namespace AhDung.WinForm
             DefaultDelay = 500;
             AllowFloating = true;
 
-            Bitmap spriteImage;
             using (var ms = new MemoryStream(Convert.FromBase64String(DefaultIconData)))
             {
-                //不能直接用Img.FromMs得到的对象，怀疑因该方法得到的对象与源ms有瓜葛
-                //ms释放后会导致莫名问题，比如下面的Clone会引发内存不足异常
-                //而new Bitmap(Image)相当于基于Image重造了一个全新的bmp
-                spriteImage = new Bitmap(Image.FromStream(ms));
-            }
+                var spriteImage = (Bitmap)Image.FromStream(ms);
 
-            using (spriteImage)
-            {
+                using (spriteImage)
+                {
 #if SmallSize
-                const int imageSize = 24;
+                    const int imageSize = 24;
 #else
-                const int imageSize = 32;
+                    const int imageSize = 32;
 #endif
-                _icons = new Image[4]; //[0]=null
-                _icons[1] = spriteImage.Clone(new Rectangle(0, 0, imageSize, imageSize), spriteImage.PixelFormat);
-                _icons[2] = spriteImage.Clone(new RectangleF(imageSize, 0, imageSize, imageSize), spriteImage.PixelFormat);
-                _icons[3] = spriteImage.Clone(new RectangleF(2 * imageSize, 0, imageSize, imageSize), spriteImage.PixelFormat);
+                    _icons = new Image[4]; //[0]=null
+                    _icons[1] = spriteImage.Clone(new Rectangle(0, 0, imageSize, imageSize), spriteImage.PixelFormat);
+                    _icons[2] = spriteImage.Clone(new RectangleF(imageSize, 0, imageSize, imageSize), spriteImage.PixelFormat);
+                    _icons[3] = spriteImage.Clone(new RectangleF(2 * imageSize, 0, imageSize, imageSize), spriteImage.PixelFormat);
+                }
             }
         }
 
@@ -339,15 +334,22 @@ MUEPCkQu+eSUV255DwrrS65Kum4eyRJNAy304aSXXrriTk8wOgg4gIB22okbjjbrICC9E/jnuEcR
             /// </summary>
             public Point BasePoint { get; set; }
 
+            Image _icon;
             /// <summary>
             /// 提示图标
             /// </summary>
             public Image TipIcon
             {
-                //有零星反映访问TipIcon会抛异常，姑且看看独占后能否解决
-                [MethodImpl(MethodImplOptions.Synchronized)]
-                get;
-                set;
+                private get { return _icon; }
+
+                //让每个窗体拥有各自的Image对象，共用有可能造成争用异常
+                //在窗体销毁时一同释放_icon
+                set
+                {
+                    if (_icon == value) { return; }
+                    if (_icon != null) { _icon.Dispose(); }
+                    _icon = value == null ? null : new Bitmap(value);
+                }
             }
 
             string _tipText;
@@ -572,6 +574,7 @@ MUEPCkQu+eSUV255DwrrS65Kum4eyRJNAy304aSXXrriTk8wOgg4gIB22okbjjbrICC9E/jnuEcR
                 if (disposing)
                 {
                     _timer.Dispose();//注意释放这货
+                    if (_icon != null) { _icon.Dispose(); }
                 }
                 base.Dispose(disposing);
             }

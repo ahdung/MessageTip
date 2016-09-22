@@ -215,15 +215,16 @@ namespace AhDung.WinForm
                 }
             }
 
-            //异步Show
-            ThreadPool.QueueUserWorkItem(obj => new TipForm
+            //异步Show。线程池偶尔不可靠
+            new Thread(() => new TipForm
             {
                 TipText = text,
                 TipIcon = icon,
                 Delay = delay < 0 ? DefaultDelay : delay,
                 Floating = AllowFloating,
                 BasePoint = point.Value
-            }.ShowDialog());//要让创建浮动窗体的线程具有消息循环，所以要用ShowDialog
+            }.ShowDialog())//要让创建浮动窗体的线程具有消息循环，所以要用ShowDialog
+            { IsBackground = true }.Start();
         }
 
         /// <summary>

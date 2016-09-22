@@ -101,5 +101,10 @@ namespace AhDung
                 btnShow.PerformClick();
             }
         }
+
+        private void btnShowInPanel_Click(object sender, EventArgs e)
+        {
+            MessageTip.Show(panel1, txbText.Text);
+        }
     }
 }

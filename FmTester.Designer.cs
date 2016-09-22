@@ -44,6 +44,8 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.txbInput = new System.Windows.Forms.ToolStripTextBox();
             this.btnEnter = new System.Windows.Forms.ToolStripButton();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.btnShowInPanel = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.nudDelay)).BeginInit();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -147,8 +149,7 @@
             // 
             // btnOk
             // 
-            this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnOk.Location = new System.Drawing.Point(24, 155);
+            this.btnOk.Location = new System.Drawing.Point(25, 156);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(101, 23);
             this.btnOk.TabIndex = 5;
@@ -158,8 +159,7 @@
             // 
             // btnWarning
             // 
-            this.btnWarning.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnWarning.Location = new System.Drawing.Point(131, 155);
+            this.btnWarning.Location = new System.Drawing.Point(132, 156);
             this.btnWarning.Name = "btnWarning";
             this.btnWarning.Size = new System.Drawing.Size(101, 23);
             this.btnWarning.TabIndex = 6;
@@ -169,8 +169,7 @@
             // 
             // btnError
             // 
-            this.btnError.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnError.Location = new System.Drawing.Point(238, 155);
+            this.btnError.Location = new System.Drawing.Point(239, 156);
             this.btnError.Name = "btnError";
             this.btnError.Size = new System.Drawing.Size(101, 23);
             this.btnError.TabIndex = 7;
@@ -180,8 +179,8 @@
             // 
             // btnShow
             // 
-            this.btnShow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnShow.Location = new System.Drawing.Point(370, 155);
+            this.btnShow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnShow.Location = new System.Drawing.Point(371, 156);
             this.btnShow.Name = "btnShow";
             this.btnShow.Size = new System.Drawing.Size(75, 23);
             this.btnShow.TabIndex = 8;
@@ -225,11 +224,36 @@
             this.btnEnter.Text = "ToolStripItem";
             this.btnEnter.Click += new System.EventHandler(this.btnEnter_Click);
             // 
+            // panel1
+            // 
+            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.panel1.Location = new System.Drawing.Point(25, 200);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(315, 135);
+            this.panel1.TabIndex = 10;
+            // 
+            // btnShowInPanel
+            // 
+            this.btnShowInPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnShowInPanel.Location = new System.Drawing.Point(346, 200);
+            this.btnShowInPanel.Name = "btnShowInPanel";
+            this.btnShowInPanel.Size = new System.Drawing.Size(100, 23);
+            this.btnShowInPanel.TabIndex = 11;
+            this.btnShowInPanel.Text = " ←ShowInPanel";
+            this.btnShowInPanel.UseVisualStyleBackColor = true;
+            this.btnShowInPanel.Click += new System.EventHandler(this.btnShowInPanel_Click);
+            // 
             // FmTester
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(469, 204);
+            this.ClientSize = new System.Drawing.Size(469, 347);
+            this.Controls.Add(this.btnShowInPanel);
+            this.Controls.Add(this.panel1);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.btnShow);
             this.Controls.Add(this.btnError);
@@ -275,5 +299,7 @@
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton btnEnter;
         private System.Windows.Forms.ToolStripTextBox txbInput;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Button btnShowInPanel;
     }
 }

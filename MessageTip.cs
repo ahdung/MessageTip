@@ -92,9 +92,10 @@ namespace AhDung.WinForm
         /// <param name="text">消息文本</param>
         /// <param name="delay">消息停留时长（毫秒）。指定负数则使用 DefaultDelay</param>
         /// <param name="point">指定显示位置</param>
-        public static void ShowOk(string text = null, int delay = -1, Point? point = null)
+        /// <param name="centerByPoint">以point为中心显示</param>
+        public static void ShowOk(string text = null, int delay = -1, Point? point = null, bool centerByPoint = false)
         {
-            Show(text, _icons[1], delay, point);
+            Show(text, _icons[1], delay, point, centerByPoint);
         }
 
         /// <summary>
@@ -114,9 +115,10 @@ namespace AhDung.WinForm
         /// <param name="text">消息文本</param>
         /// <param name="delay">消息停留时长（毫秒）。指定负数则使用 DefaultDelay</param>
         /// <param name="point">指定显示位置</param>
-        public static void ShowWarning(string text = null, int delay = -1, Point? point = null)
+        /// <param name="centerByPoint">以point为中心显示</param>
+        public static void ShowWarning(string text = null, int delay = -1, Point? point = null, bool centerByPoint = false)
         {
-            Show(text, _icons[2], delay, point);
+            Show(text, _icons[2], delay, point, centerByPoint);
         }
 
         /// <summary>
@@ -136,9 +138,10 @@ namespace AhDung.WinForm
         /// <param name="text">消息文本</param>
         /// <param name="delay">消息停留时长（毫秒）。指定负数则使用 DefaultDelay</param>
         /// <param name="point">指定显示位置</param>
-        public static void ShowError(string text = null, int delay = -1, Point? point = null)
+        /// <param name="centerByPoint">以point为中心显示</param>
+        public static void ShowError(string text = null, int delay = -1, Point? point = null, bool centerByPoint = false)
         {
-            Show(text, _icons[3], delay, point);
+            Show(text, _icons[3], delay, point, centerByPoint);
         }
 
         /// <summary>
@@ -154,7 +157,7 @@ namespace AhDung.WinForm
             {
                 throw new ArgumentNullException("controlOrItem");
             }
-            Show(text, CheckAndConvertTipIconValue(tipIcon), delay, GetCenterPosition(controlOrItem));
+            Show(text, CheckAndConvertTipIconValue(tipIcon), delay, GetCenterPosition(controlOrItem), !(controlOrItem is ButtonBase || controlOrItem is ToolStripItem));
         }
 
         /// <summary>
@@ -170,7 +173,7 @@ namespace AhDung.WinForm
             {
                 throw new ArgumentNullException("controlOrItem");
             }
-            Show(text, icon, delay, GetCenterPosition(controlOrItem));
+            Show(text, icon, delay, GetCenterPosition(controlOrItem), !(controlOrItem is ButtonBase || controlOrItem is ToolStripItem));
         }
 
         /// <summary>
@@ -180,9 +183,10 @@ namespace AhDung.WinForm
         /// <param name="tipIcon">内置图标</param>
         /// <param name="delay">消息停留时长（毫秒）。指定负数则使用 DefaultDelay</param>
         /// <param name="point">指定显示位置。为null则按活动控件</param>
-        public static void Show(string text, TipIcon tipIcon = TipIcon.None, int delay = -1, Point? point = null)
+        /// <param name="centerByPoint">以point为中心显示</param>
+        public static void Show(string text, TipIcon tipIcon = TipIcon.None, int delay = -1, Point? point = null, bool centerByPoint = false)
         {
-            Show(text, CheckAndConvertTipIconValue(tipIcon), delay, point);
+            Show(text, CheckAndConvertTipIconValue(tipIcon), delay, point, centerByPoint);
         }
 
         /// <summary>
@@ -192,7 +196,8 @@ namespace AhDung.WinForm
         /// <param name="icon">图标</param>
         /// <param name="delay">消息停留时长（毫秒）。指定负数则使用 DefaultDelay</param>
         /// <param name="point">指定显示位置。为null则按活动控件</param>
-        public static void Show(string text, Image icon, int delay = -1, Point? point = null)
+        /// <param name="centerByPoint">以point为中心显示</param>
+        public static void Show(string text, Image icon, int delay = -1, Point? point = null, bool centerByPoint = false)
         {
             if (point == null)
             {
@@ -222,7 +227,8 @@ namespace AhDung.WinForm
                 TipIcon = icon,
                 Delay = delay < 0 ? DefaultDelay : delay,
                 Floating = AllowFloating,
-                BasePoint = point.Value
+                BasePoint = point.Value,
+                CenterByBasePoint = centerByPoint
             }.ShowDialog())//要让创建浮动窗体的线程具有消息循环，所以要用ShowDialog
             { IsBackground = true }.Start();
         }
@@ -335,6 +341,11 @@ MUEPCkQu+eSUV255DwrrS65Kum4eyRJNAy304aSXXrriTk8wOgg4gIB22okbjjbrICC9E/jnuEcR
             /// </summary>
             public Point BasePoint { get; set; }
 
+            /// <summary>
+            /// 是否以基准点为中心显示。false则会在基准点上下错开一定距离
+            /// </summary>
+            public bool CenterByBasePoint { get; set; }
+
             Image _icon;
             /// <summary>
             /// 提示图标
@@ -445,12 +456,24 @@ MUEPCkQu+eSUV255DwrrS65Kum4eyRJNAy304aSXXrriTk8wOgg4gIB22okbjjbrICC9E/jnuEcR
                     p.X = right;
                 }
 
-                //纵向处理。默认在上方显示
-                dist = 20;//错开基准点上下20像素
-                p.Y -= this.Height + dist;
-                if (p.Y < screen.Top + 50)//若太靠屏幕上方，往下显示
+                //纵向处理
+                if (CenterByBasePoint)
                 {
-                    p.Y += this.Height + 2 * dist;
+                    p.Y -= this.Height / 2;
+                }
+                else
+                {
+                    dist = 20;//错开基准点上下20像素
+                    p.Y -= this.Height + dist;
+                }
+
+                if (p.Y < screen.Top + 50)//若太靠屏幕顶部
+                {
+                    if (!CenterByBasePoint)
+                    {
+                        p.Y += this.Height + 2 * dist;//在下方错开
+                    }
+
                     _floatDown = true;//动画改为下降
                 }
 

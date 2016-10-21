@@ -9,8 +9,6 @@ Global
 		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
 		Release|x86 = Release|x86
-		SmallSize|Any CPU = SmallSize|Any CPU
-		SmallSize|x86 = SmallSize|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{DDBDAC74-3561-454D-B38D-BE5E44E18C2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -20,10 +18,6 @@ Global
 		{DDBDAC74-3561-454D-B38D-BE5E44E18C2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DDBDAC74-3561-454D-B38D-BE5E44E18C2E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DDBDAC74-3561-454D-B38D-BE5E44E18C2E}.Release|x86.ActiveCfg = Release|Any CPU
-		{DDBDAC74-3561-454D-B38D-BE5E44E18C2E}.SmallSize|Any CPU.ActiveCfg = SmallSize|Any CPU
-		{DDBDAC74-3561-454D-B38D-BE5E44E18C2E}.SmallSize|Any CPU.Build.0 = SmallSize|Any CPU
-		{DDBDAC74-3561-454D-B38D-BE5E44E18C2E}.SmallSize|x86.ActiveCfg = SmallSize|x86
-		{DDBDAC74-3561-454D-B38D-BE5E44E18C2E}.SmallSize|x86.Build.0 = SmallSize|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

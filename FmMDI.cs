@@ -1,5 +1,4 @@
-﻿using AhDung.WinForm;
-using System;
+﻿using System;
 using System.Windows.Forms;
 
 namespace AhDung
@@ -15,7 +14,7 @@ namespace AhDung
         {
             new FmTester
             {
-                Text = "Form " + this.MdiChildren.Length + 1,
+                Text = "Form " + (this.MdiChildren.Length + 1),
                 MdiParent = this
             }.Show();
         }
@@ -32,7 +31,7 @@ namespace AhDung
 
         private void txbText_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode== Keys.Enter)
+            if (e.KeyCode == Keys.Enter)
             {
                 btnShow.PerformClick();
             }

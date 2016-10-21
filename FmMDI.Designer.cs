@@ -48,7 +48,7 @@
             this.btnTestItem});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(722, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(856, 25);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -87,13 +87,13 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 25);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(722, 47);
+            this.panel1.Size = new System.Drawing.Size(856, 47);
             this.panel1.TabIndex = 1;
             // 
             // btnShow
             // 
             this.btnShow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnShow.Location = new System.Drawing.Point(635, 11);
+            this.btnShow.Location = new System.Drawing.Point(769, 11);
             this.btnShow.Name = "btnShow";
             this.btnShow.Size = new System.Drawing.Size(75, 23);
             this.btnShow.TabIndex = 1;
@@ -108,7 +108,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txbText.Location = new System.Drawing.Point(49, 13);
             this.txbText.Name = "txbText";
-            this.txbText.Size = new System.Drawing.Size(580, 21);
+            this.txbText.Size = new System.Drawing.Size(714, 21);
             this.txbText.TabIndex = 0;
             this.txbText.Text = "Try press Enter key";
             this.txbText.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txbText_KeyDown);
@@ -126,11 +126,12 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(722, 504);
+            this.ClientSize = new System.Drawing.Size(856, 654);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.toolStrip1);
             this.IsMdiContainer = true;
             this.Name = "FmMDI";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "FmMDI";
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();

@@ -116,7 +116,11 @@
     <Compile Include="FmTester.Designer.cs">
       <DependentUpon>FmTester.cs</DependentUpon>
     </Compile>
-    <Compile Include="MessageTip.cs" />
+    <Compile Include="MessageTip\Border.cs" />
+    <Compile Include="MessageTip\GraphicsUtils.cs" />
+    <Compile Include="MessageTip\LayeredWindow.cs" />
+    <Compile Include="MessageTip\MessageTip.cs" />
+    <Compile Include="MessageTip\TipStyle.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

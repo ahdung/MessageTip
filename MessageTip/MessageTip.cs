@@ -145,7 +145,7 @@ namespace AhDung
             {
                 throw new ArgumentNullException("controlOrItem");
             }
-            Show(text, style ?? DefaultStyle ?? TipStyle.Default, delay, GetCenterPosition(controlOrItem), !(controlOrItem is ButtonBase || controlOrItem is ToolStripItem));
+            Show(text, style, delay, GetCenterPosition(controlOrItem), !(controlOrItem is ButtonBase || controlOrItem is ToolStripItem));
         }
 
         /// <summary>
@@ -174,7 +174,7 @@ namespace AhDung
                     bool floatDown;
                     Rectangle contentBounds;
 
-                    layer = new LayeredWindow(CreateTipImage(text ?? string.Empty, tStyle, out contentBounds))
+                    layer = new LayeredWindow(CreateTipImage(text ?? string.Empty, tStyle ?? DefaultStyle ?? TipStyle.Default, out contentBounds))
                     {
                         Alpha = 0,
                         Location = GetLocation(contentBounds, tBasePoint, tCenterByPoint, out floatDown),
@@ -202,6 +202,7 @@ namespace AhDung
         {
             var layer = (LayeredWindow)sender;
             var args = layer.Tag as object[];
+            var delay = (int)args[0];
             var floatDown = args[1];
 
             if (Floating)
@@ -222,7 +223,6 @@ namespace AhDung
             }
 
             FadeEffect(layer, true);
-            var delay = (int)args[0];
             Thread.Sleep(delay < 0 ? 0 : delay);
             layer.Close();
         }

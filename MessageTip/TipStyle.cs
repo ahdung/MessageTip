@@ -130,12 +130,11 @@ namespace AhDung
             IconSpacing = 5;
             TextFont = new Font(SystemFonts.MessageBoxFont.FontFamily, 12);
             var fontName = TextFont.Name;
-            if (fontName == "微软雅黑") { TextOffset = new Point(0, -1); }
-            else if (fontName == "宋体") { TextOffset = new Point(1, 1); }
+            if (fontName == "宋体") { TextOffset = new Point(1, 1); }
             TextColor = Color.Black;
-            BackColor = Color.WhiteSmoke;
+            BackColor = Color.FromArgb(252,252,252);
             CornerRadius = 3;
-            ShadowColor = _border.Color;
+            ShadowColor = PresetsResources.Colors[0, 2];
             ShadowRadius = 4;
             ShadowOffset = new Point(0, 3);
             Padding = new Padding(10, 5, 10, 5);
@@ -199,12 +198,10 @@ namespace AhDung
             };
             style.BackBrush = r =>
             {
-                var brush = new LinearGradientBrush(
-                    r,
+                var brush = new LinearGradientBrush(r,
                     PresetsResources.Colors[index, 1],
                     Color.White,
-                    LinearGradientMode.Horizontal
-                    );
+                    LinearGradientMode.Horizontal);
                 brush.SetBlendTriangularShape(0.5f);
                 return brush;
             };
@@ -243,10 +240,10 @@ namespace AhDung
             public static readonly Color[,] Colors =
             {
                     //边框色、背景色、阴影色
-             /*灰*/ {Color.FromArgb(150,150,150), Color.FromArgb(245,245,245), Color.FromArgb(150,  0,  0,  0)},
+             /*灰*/ {Color.FromArgb(150,150,150), Color.FromArgb(245,245,245), Color.FromArgb(110,  0,  0,  0)},
              /*绿*/ {Color.FromArgb(  0,189,  0), Color.FromArgb(232,255,232), Color.FromArgb(150,  0,150,  0)},
              /*橙*/ {Color.FromArgb(255,150,  0), Color.FromArgb(255,250,240), Color.FromArgb(150,250,100,  0)},
-             /*红*/ {Color.FromArgb(255, 79, 79), Color.FromArgb(255,245,245), Color.FromArgb(150,255, 30, 30)}
+             /*红*/ {Color.FromArgb(255, 79, 79), Color.FromArgb(255,245,245), Color.FromArgb(140,255, 30, 30)}
             };
 
             //CreateIcon依赖Colors，所以需在Colors后初始化
@@ -283,11 +280,11 @@ namespace AhDung
                     if (index == 1) //√
                     {
                         pen = new Pen(color, 4);
-                        g.DrawLines(pen, new[] { new Point(3, 11), new Point(10, 18), new Point(21, 4) });
+                        g.DrawLines(pen, new[] { new Point(3, 11), new Point(10, 18), new Point(20, 5) });
                     }
                     else if (index == 2) //！
                     {
-                        var points = new[] { new Point(12, 3), new Point(3, 21), new Point(21, 21) };
+                        var points = new[] { new Point(12, 3), new Point(3, 20), new Point(21, 20) };
                         pen = new Pen(color, 2) { LineJoin = LineJoin.Bevel };
                         g.DrawPolygon(pen, points);
 
@@ -295,8 +292,8 @@ namespace AhDung
                         g.FillPolygon(brush, points);
 
                         pen.Color = Colors[index, 1];
-                        g.DrawLine(pen, new Point(12, 9), new Point(12, 16));
-                        g.DrawLine(pen, new Point(12, 18), new Point(12, 20));
+                        g.DrawLine(pen, new Point(12, 8), new Point(12, 15));
+                        g.DrawLine(pen, new Point(12, 17), new Point(12, 19));
                     }
                     else //×
                     {

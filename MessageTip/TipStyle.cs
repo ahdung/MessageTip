@@ -11,21 +11,11 @@ namespace AhDung
     /// </summary>
     public sealed class TipStyle : IDisposable
     {
+        bool _isPresets;
         bool _keepFont;
         bool _keepIcon;
 
         readonly Border _border;
-
-        bool IsPresets
-        {
-            get
-            {
-                return this == Default
-                || this == Green
-                || this == Orange
-                || this == Red;
-            }
-        }
 
         /// <summary>
         /// 获取边框信息。内部用
@@ -132,7 +122,7 @@ namespace AhDung
             var fontName = TextFont.Name;
             if (fontName == "宋体") { TextOffset = new Point(1, 1); }
             TextColor = Color.Black;
-            BackColor = Color.FromArgb(252,252,252);
+            BackColor = Color.FromArgb(252, 252, 252);
             CornerRadius = 3;
             ShadowColor = PresetsResources.Colors[0, 2];
             ShadowRadius = 4;
@@ -152,13 +142,13 @@ namespace AhDung
             ((IDisposable)this).Dispose();
         }
 
-        static TipStyle _default;
+        static TipStyle _gray;
         /// <summary>
-        /// 预置的默认样式（灰白无图标）
+        /// 预置的灰色样式
         /// </summary>
-        public static TipStyle Default
+        public static TipStyle Gray
         {
-            get { return _default ?? (_default = CreatePresetsStyle(0)); }
+            get { return _gray ?? (_gray = CreatePresetsStyle(0)); }
         }
 
         static TipStyle _green;
@@ -195,6 +185,7 @@ namespace AhDung
                 Icon = PresetsResources.Icons[index],
                 BorderColor = PresetsResources.Colors[index, 0],
                 ShadowColor = PresetsResources.Colors[index, 2],
+                _isPresets = true
             };
             style.BackBrush = r =>
             {
@@ -213,7 +204,10 @@ namespace AhDung
         {
             lock (this)
             {
-                if (_disposed || IsPresets) { return; }//不销毁预置对象
+                if (_disposed || _isPresets)//不销毁预置对象
+                {
+                    return;
+                }
 
                 _border.Dispose();
                 BackBrush = null;
@@ -249,7 +243,7 @@ namespace AhDung
             //CreateIcon依赖Colors，所以需在Colors后初始化
             public static readonly Bitmap[] Icons =
             {
-                null,
+                CreateIcon(0),
                 CreateIcon(1),
                 CreateIcon(2),
                 CreateIcon(3)
@@ -258,10 +252,10 @@ namespace AhDung
             /// <summary>
             /// 创建图标
             /// </summary>
-            /// <param name="index">1=√；2=！；3=×；其余=null</param>
+            /// <param name="index">0=i；1=√；2=！；3=×；其余=null</param>
             private static Bitmap CreateIcon(int index)
             {
-                if (index < 1 || index > 3)
+                if (index < 0 || index > 3)
                 {
                     return null;
                 }
@@ -277,7 +271,16 @@ namespace AhDung
                     g.PixelOffsetMode = PixelOffsetMode.HighQuality;
 
                     var color = Colors[index, 0];
-                    if (index == 1) //√
+                    if (index == 0) //i
+                    {
+                        brush = new SolidBrush(Color.FromArgb(103, 148, 186));
+                        g.FillEllipse(brush, 3, 3, 18, 18);
+
+                        pen = new Pen(Colors[index, 1], 2);
+                        g.DrawLine(pen, new Point(12, 6), new Point(12, 8));
+                        g.DrawLine(pen, new Point(12, 10), new Point(12, 18));
+                    }
+                    else if (index == 1) //√
                     {
                         pen = new Pen(color, 4);
                         g.DrawLines(pen, new[] { new Point(3, 11), new Point(10, 18), new Point(20, 5) });

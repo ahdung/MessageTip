@@ -270,7 +270,7 @@ namespace AhDung
         /// </summary>
         private void CreateWindow()
         {
-            int exStyle = 0x80000;
+            int exStyle = 0x80000;                      //WS_EX_LAYERED
             if (TopMost) { exStyle |= 0x8; }            //WS_EX_TOPMOST
             if (!Activation) { exStyle |= 0x08000000; } //WS_EX_NOACTIVATE
             if (MouseThrough) { exStyle |= 0x20; }      //WS_EX_TRANSPARENT
@@ -283,7 +283,7 @@ namespace AhDung
                 0, 0, 0, 0, //坐标尺寸全由UpdateLayeredWindow接管，这里无所谓
                 IntPtr.Zero, IntPtr.Zero, HInstance, IntPtr.Zero);
 
-            if (Marshal.GetLastWin32Error() != 0)
+            if (_hWnd == IntPtr.Zero)
             {
                 throw new Win32Exception();
             }
@@ -410,7 +410,7 @@ namespace AhDung
             if (!UpdateLayeredWindow(_hWnd,
                 IntPtr.Zero, LocationInternal, _size,
                 _dcMemory, PointOrSize.Empty,
-                0, ref _blend, 2/*ULW_ALPHA*/))
+                0, _blend, 2/*ULW_ALPHA*/))
             {
                 //忽略窗体句柄无效ERROR_INVALID_WINDOW_HANDLE
                 if (Marshal.GetLastWin32Error() == 0x578) { return; }
@@ -524,7 +524,7 @@ namespace AhDung
         private static extern IntPtr CreateWindowEx(int dwExStyle, string lpClassName, string lpWindowName, int dwStyle, int x, int y, int nWidth, int nHeight, IntPtr hWndParent, IntPtr hMenu, IntPtr hInstance, object lpParam);
 
         [DllImport("user32.dll", SetLastError = true)]
-        private static extern bool UpdateLayeredWindow(IntPtr hWnd, IntPtr hdcDst, PointOrSize pptDst, PointOrSize pSizeDst, IntPtr hdcSrc, PointOrSize pptSrc, int crKey, ref BLENDFUNCTION pBlend, int dwFlags);
+        private static extern bool UpdateLayeredWindow(IntPtr hWnd, IntPtr hdcDst, PointOrSize pptDst, PointOrSize pSizeDst, IntPtr hdcSrc, PointOrSize pptSrc, int crKey, BLENDFUNCTION pBlend, int dwFlags);
 
         [DllImport("gdi32.dll", SetLastError = true)]
         private static extern IntPtr CreateCompatibleDC(IntPtr hDC);
@@ -555,7 +555,7 @@ namespace AhDung
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        private struct BLENDFUNCTION
+        private class BLENDFUNCTION
         {
             public byte BlendOp;
             public byte BlendFlags;
@@ -580,14 +580,9 @@ namespace AhDung
         {
             public int XOrWidth, YOrHeight;
 
-            private static PointOrSize _empty;
+            public static readonly PointOrSize Empty = new PointOrSize();
 
-            public static PointOrSize Empty
-            {
-                get { return _empty ?? (_empty = new PointOrSize()); }
-            }
-
-            public PointOrSize() { }
+            public PointOrSize() { XOrWidth = 0; YOrHeight = 0; }
 
             public PointOrSize(int xOrWidth, int yOrHeight)
             {

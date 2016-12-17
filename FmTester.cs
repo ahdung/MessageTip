@@ -70,8 +70,8 @@ namespace AhDung
         private void btnRestore_Click(object sender, EventArgs e)
         {
             _style.Clear();
-            _style=new TipStyle();
-            propertyGrid1.SelectedObject=_style;
+            _style = new TipStyle();
+            propertyGrid1.SelectedObject = _style;
         }
 
     }

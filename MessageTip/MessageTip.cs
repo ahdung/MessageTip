@@ -61,6 +61,10 @@ namespace AhDung
             Fade = 100;
             Floating = true;
             DefaultDelay = 600;
+            DefaultStyle = TipStyle.Gray;
+            OkStyle = TipStyle.Green;
+            WarningStyle = TipStyle.Orange;
+            ErrorStyle = TipStyle.Red;
         }
 
         /// <summary>
@@ -174,7 +178,7 @@ namespace AhDung
                     bool floatDown;
                     Rectangle contentBounds;
 
-                    layer = new LayeredWindow(CreateTipImage(text ?? string.Empty, tStyle ?? DefaultStyle ?? TipStyle.Default, out contentBounds))
+                    layer = new LayeredWindow(CreateTipImage(text ?? string.Empty, tStyle ?? DefaultStyle ?? TipStyle.Gray, out contentBounds))
                     {
                         Alpha = 0,
                         Location = GetLocation(contentBounds, tBasePoint, tCenterByPoint, out floatDown),

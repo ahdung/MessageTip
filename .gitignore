@@ -27,3 +27,4 @@ _ReSharper*/
 [Tt]est[Rr]esult*
 *.vssscc
 $tf*/
+Fm[0-9].*

@@ -93,7 +93,7 @@ namespace AhDung
         public Color ShadowColor { get; set; }
 
         /// <summary>
-        /// 获取或设置阴影羽化半径（默认3）
+        /// 获取或设置阴影羽化半径（默认4）
         /// </summary>
         public int ShadowRadius { get; set; }
 

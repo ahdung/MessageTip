@@ -520,8 +520,8 @@ namespace AhDung
         [DllImport("gdi32.dll", SetLastError = true)]
         private static extern IntPtr SelectObject(IntPtr hdc, IntPtr obj);
 
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern IntPtr CreateWindowEx(int dwExStyle, string lpClassName, string lpWindowName, int dwStyle, int x, int y, int nWidth, int nHeight, IntPtr hWndParent, IntPtr hMenu, IntPtr hInstance, object lpParam);
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        private static extern IntPtr CreateWindowEx(int dwExStyle, string lpClassName, string lpWindowName, int dwStyle, int x, int y, int nWidth, int nHeight, IntPtr hWndParent, IntPtr hMenu, IntPtr hInstance, IntPtr lpParam);
 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern bool UpdateLayeredWindow(IntPtr hWnd, IntPtr hdcDst, PointOrSize pptDst, PointOrSize pSizeDst, IntPtr hdcSrc, PointOrSize pptSrc, int crKey, BLENDFUNCTION pBlend, int dwFlags);

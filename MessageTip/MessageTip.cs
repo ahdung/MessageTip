@@ -73,9 +73,11 @@ namespace AhDung
         /// <param name="controlOrItem">控件或工具栏项</param>
         /// <param name="text">消息文本</param>
         /// <param name="delay">消息停留时长(ms)。为负时使用全局时长</param>
-        public static void ShowOk(Component controlOrItem, string text = null, int delay = -1)
+        /// <param name="floating">是否漂浮，不指定则使用全局设置</param>
+        /// <param name="centerInControl">是否在控件中央显示，不指定则自动判断</param>
+        public static void ShowOk(Component controlOrItem, string text = null, int delay = -1, bool? floating = null, bool? centerInControl = null)
         {
-            Show(controlOrItem, text, OkStyle ?? TipStyle.Green, delay);
+            Show(controlOrItem, text, OkStyle ?? TipStyle.Green, delay, floating, centerInControl);
         }
 
         /// <summary>
@@ -83,11 +85,12 @@ namespace AhDung
         /// </summary>
         /// <param name="text">消息文本</param>
         /// <param name="delay">消息停留时长(ms)。为负时使用全局时长</param>
+        /// <param name="floating">是否漂浮，不指定则使用全局设置</param>
         /// <param name="point">消息窗显示位置。不指定则智能判定，当由工具栏项(ToolStripItem)弹出时，请指定该参数或使用接收控件的重载</param>
         /// <param name="centerByPoint">是否以point参数为中心进行呈现。为false则是在其附近呈现</param>
-        public static void ShowOk(string text = null, int delay = -1, Point? point = null, bool centerByPoint = false)
+        public static void ShowOk(string text = null, int delay = -1, bool? floating = null, Point? point = null, bool centerByPoint = false)
         {
-            Show(text, OkStyle ?? TipStyle.Green, delay, point, centerByPoint);
+            Show(text, OkStyle ?? TipStyle.Green, delay, floating, point, centerByPoint);
         }
 
         /// <summary>
@@ -96,9 +99,11 @@ namespace AhDung
         /// <param name="controlOrItem">控件或工具栏项</param>
         /// <param name="text">消息文本</param>
         /// <param name="delay">消息停留时长(ms)。为负时使用全局时长</param>
-        public static void ShowWarning(Component controlOrItem, string text = null, int delay = -1)
+        /// <param name="floating">是否漂浮，不指定则使用全局设置</param>
+        /// <param name="centerInControl">是否在控件中央显示，不指定则自动判断</param>
+        public static void ShowWarning(Component controlOrItem, string text = null, int delay = -1, bool? floating = null, bool? centerInControl = null)
         {
-            Show(controlOrItem, text, WarningStyle ?? TipStyle.Orange, delay);
+            Show(controlOrItem, text, WarningStyle ?? TipStyle.Orange, delay, floating, centerInControl);
         }
 
         /// <summary>
@@ -106,11 +111,12 @@ namespace AhDung
         /// </summary>
         /// <param name="text">消息文本</param>
         /// <param name="delay">消息停留时长(ms)。为负时使用全局时长</param>
+        /// <param name="floating">是否漂浮，不指定则使用全局设置</param>
         /// <param name="point">消息窗显示位置。不指定则智能判定，当由工具栏项(ToolStripItem)弹出时，请指定该参数或使用接收控件的重载</param>
         /// <param name="centerByPoint">是否以point参数为中心进行呈现。为false则是在其附近呈现</param>
-        public static void ShowWarning(string text = null, int delay = -1, Point? point = null, bool centerByPoint = false)
+        public static void ShowWarning(string text = null, int delay = -1, bool? floating = null, Point? point = null, bool centerByPoint = false)
         {
-            Show(text, WarningStyle ?? TipStyle.Orange, delay, point, centerByPoint);
+            Show(text, WarningStyle ?? TipStyle.Orange, delay, floating, point, centerByPoint);
         }
 
         /// <summary>
@@ -119,9 +125,11 @@ namespace AhDung
         /// <param name="controlOrItem">控件或工具栏项</param>
         /// <param name="text">消息文本</param>
         /// <param name="delay">消息停留时长(ms)。为负时使用全局时长</param>
-        public static void ShowError(Component controlOrItem, string text = null, int delay = -1)
+        /// <param name="floating">是否漂浮，不指定则使用全局设置</param>
+        /// <param name="centerInControl">是否在控件中央显示，不指定则自动判断</param>
+        public static void ShowError(Component controlOrItem, string text = null, int delay = -1, bool? floating = null, bool? centerInControl = null)
         {
-            Show(controlOrItem, text, ErrorStyle ?? TipStyle.Red, delay);
+            Show(controlOrItem, text, ErrorStyle ?? TipStyle.Red, delay, floating, centerInControl);
         }
 
         /// <summary>
@@ -129,11 +137,12 @@ namespace AhDung
         /// </summary>
         /// <param name="text">消息文本</param>
         /// <param name="delay">消息停留时长(ms)。为负时使用全局时长</param>
+        /// <param name="floating">是否漂浮，不指定则使用全局设置</param>
         /// <param name="point">消息窗显示位置。不指定则智能判定，当由工具栏项(ToolStripItem)弹出时，请指定该参数或使用接收控件的重载</param>
         /// <param name="centerByPoint">是否以point参数为中心进行呈现。为false则是在其附近呈现</param>
-        public static void ShowError(string text = null, int delay = -1, Point? point = null, bool centerByPoint = false)
+        public static void ShowError(string text = null, int delay = -1, bool? floating = null, Point? point = null, bool centerByPoint = false)
         {
-            Show(text, ErrorStyle ?? TipStyle.Red, delay, point, centerByPoint);
+            Show(text, ErrorStyle ?? TipStyle.Red, delay, floating, point, centerByPoint);
         }
 
         /// <summary>
@@ -143,13 +152,15 @@ namespace AhDung
         /// <param name="text">消息文本</param>
         /// <param name="style">消息样式。不指定则使用默认样式</param>
         /// <param name="delay">消息停留时长(ms)。为负时使用全局时长</param>
-        public static void Show(Component controlOrItem, string text, TipStyle style = null, int delay = -1)
+        /// <param name="floating">是否漂浮，不指定则使用全局设置</param>
+        /// <param name="centerInControl">是否在控件中央显示，不指定则自动判断</param>
+        public static void Show(Component controlOrItem, string text, TipStyle style = null, int delay = -1, bool? floating = null, bool? centerInControl = null)
         {
             if (controlOrItem == null)
             {
                 throw new ArgumentNullException("controlOrItem");
             }
-            Show(text, style, delay, GetCenterPosition(controlOrItem), !(controlOrItem is ButtonBase || controlOrItem is ToolStripItem));
+            Show(text, style, delay, floating, GetCenterPosition(controlOrItem), centerInControl ?? IsContainerLike(controlOrItem));
         }
 
         /// <summary>
@@ -158,9 +169,10 @@ namespace AhDung
         /// <param name="text">消息文本</param>
         /// <param name="style">消息样式。不指定则使用默认样式</param>
         /// <param name="delay">消息停留时长(ms)。为负时使用全局时长</param>
+        /// <param name="floating">是否漂浮，不指定则使用全局设置</param>
         /// <param name="point">消息窗显示位置。不指定则智能判定，当由工具栏项(ToolStripItem)弹出时，请指定该参数或使用接收控件的重载</param>
         /// <param name="centerByPoint">是否以point参数为中心进行呈现。为false则是在其附近呈现</param>
-        public static void Show(string text, TipStyle style = null, int delay = -1, Point? point = null, bool centerByPoint = false)
+        public static void Show(string text, TipStyle style = null, int delay = -1, bool? floating = null, Point? point = null, bool centerByPoint = false)
         {
             var basePoint = point ?? DetemineActive();
 
@@ -170,7 +182,8 @@ namespace AhDung
                 var tBasePoint = (Point)args[0];
                 var tStyle = (TipStyle)args[1];
                 var tDelay = (int)args[2];
-                var tCenterByPoint = (bool)args[3];
+                var tFloating = (bool)args[3];
+                var tCenterByPoint = (bool)args[4];
 
                 LayeredWindow layer = null;
                 try
@@ -184,7 +197,7 @@ namespace AhDung
                         Location = GetLocation(contentBounds, tBasePoint, tCenterByPoint, out floatDown),
                         MouseThrough = true,
                         TopMost = true,
-                        Tag = new object[] { tDelay < 0 ? DefaultDelay : tDelay, floatDown }
+                        Tag = new object[] { tDelay, tFloating, floatDown }
                     };
                     layer.Showing += layer_Showing;
                     layer.Closing += layer_Closing;
@@ -199,7 +212,10 @@ namespace AhDung
                         layer.Dispose();
                     }
                 }
-            }) { IsBackground = true, Name = "T_Showing" }.Start(new object[] { basePoint, style, delay, centerByPoint });
+            }) { IsBackground = true, Name = "T_Showing" }.Start(new object[]
+            {
+                basePoint, style, delay<0?DefaultDelay:delay,floating??Floating, centerByPoint
+            });
         }
 
         static void layer_Showing(object sender, EventArgs e)
@@ -207,9 +223,10 @@ namespace AhDung
             var layer = (LayeredWindow)sender;
             var args = layer.Tag as object[];
             var delay = (int)args[0];
-            var floatDown = args[1];
+            var floating = (bool)args[1];
+            var floatDown = args[2];
 
-            if (Floating)
+            if (floating)
             {
                 //另起线程浮动窗体
                 new Thread(arg =>
@@ -432,7 +449,8 @@ namespace AhDung
             Control c = controlOrItem as Control;
             if (c != null)
             {
-                return c.PointToScreen(new Point(c.Width / 2, c.Height / 2));
+                var size = c.ClientSize;
+                return c.PointToScreen(new Point(size.Width / 2, size.Height / 2));
             }
             var item = controlOrItem as ToolStripItem;
             if (item != null)
@@ -443,6 +461,32 @@ namespace AhDung
                 return item.Owner.PointToScreen(pos);
             }
             throw new ArgumentException("参数只能是Control或ToolStripItem！");
+        }
+
+        /// <summary>
+        /// 判断控件看起来是否像容器（占一定面积那种）
+        /// </summary>
+        private static bool IsContainerLike(Component controlOrItem)
+        {
+            if (controlOrItem is ContainerControl
+                || controlOrItem is GroupBox
+                || controlOrItem is Panel
+                || controlOrItem is TabControl
+                || controlOrItem is DataGrid
+                || controlOrItem is DataGridView
+                || controlOrItem is ListBox
+                || controlOrItem is ListView)
+            {
+                return true;
+            }
+
+            TextBox txb = controlOrItem as TextBox;
+            if (txb != null && txb.Multiline) { return true; }
+
+            RichTextBox rtb = controlOrItem as RichTextBox;
+            if (rtb != null && rtb.Multiline) { return true; }
+
+            return false;
         }
 
         #region Win32 API

@@ -62,7 +62,7 @@ namespace AhDung
         /// <para>- 默认null，为null时使用BackColor绘制单色背景</para>
         /// <para>- 方法返回的画刷需释放</para>
         /// </summary>
-        public Func<Rectangle, Brush> BackBrush { get; set; }
+        public BrushSelector<Rectangle> BackBrush { get; set; }
 
         /// <summary>
         /// 获取或设置边框颜色（默认深灰）
@@ -200,6 +200,7 @@ namespace AhDung
         }
 
         bool _disposed;
+        [Obsolete("请改用Clear指定是否清理字体和图标")]
         void IDisposable.Dispose()
         {
             lock (this)
@@ -320,4 +321,10 @@ namespace AhDung
             }
         }
     }
+
+    //干脆自建一个委托，不依赖Func了
+    /// <summary>
+    /// 画刷选择器委托
+    /// </summary>
+    public delegate Brush BrushSelector<in T>(T arg);
 }

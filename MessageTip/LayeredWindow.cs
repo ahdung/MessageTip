@@ -18,12 +18,13 @@ namespace AhDung
 
         static WndProcDelegate _wndProc;
 
+        readonly object syncObj = new object();
         readonly PointOrSize _size;
-        readonly IntPtr _dcMemory;
-        readonly IntPtr _hBmp;
+        IntPtr _dcMemory;
+        IntPtr _hBmp;
+        IntPtr _oldObj;
 
-        //用于模式显示时，记录并disable原窗体，然后在本类关闭后enable它
-        IntPtr _activeWindow;
+        IntPtr _activeWindow; //用于模式显示时，记录并disable原窗体，然后在本类关闭后enable它
         bool _continueLoop = true;
         short _wndClass;
         IntPtr _hWnd;
@@ -198,7 +199,7 @@ namespace AhDung
         /// </summary>
         public bool IsDisposed
         {
-            get { lock (this) { return _disposed; } }
+            get { lock (syncObj) { return _disposed; } }
         }
 
         /// <summary>
@@ -220,7 +221,7 @@ namespace AhDung
                 //初始化绘制相关
                 _dcMemory = CreateCompatibleDC(IntPtr.Zero);
                 _hBmp = bmp.GetHbitmap(Color.Empty);
-                SelectObject(_dcMemory, _hBmp);
+                _oldObj = SelectObject(_dcMemory, _hBmp);
 
                 Width = bmp.Width;
                 Height = bmp.Height;
@@ -287,10 +288,9 @@ namespace AhDung
             {
                 throw new Win32Exception();
             }
-            Debug.WriteLineIf(_hWnd == IntPtr.Zero, "Failed", "CreateWindowEx");
         }
 
-        private int RunMessageLoop()
+        private int DoMessageLoop()
         {
             var m = new MSG();
             int result;
@@ -320,7 +320,6 @@ namespace AhDung
                     EnableWindow(_activeWindow, true);
                     _continueLoop = false;
                     break;
-                default: break;
             }
             return DefWndProc(hWnd, msg, wParam, lParam);
         }
@@ -336,7 +335,7 @@ namespace AhDung
             {
                 throw new ObjectDisposedException(Name ?? string.Empty);
             }
-            lock (this)
+            lock (syncObj)
             {
                 if (Visible) { return; }
                 if (modal)
@@ -351,11 +350,11 @@ namespace AhDung
                 Visible = true;
             }
             OnShowing(EventArgs.Empty);
-            if (IsDisposed) { return; }//允许Showing事件中关闭窗体
+            if (IsDisposed) { return; }//Showing事件中也许会关闭窗体
             Update();
             if (modal)
             {
-                var result = RunMessageLoop();
+                var result = DoMessageLoop();
                 SetActiveWindow(_activeWindow);
                 if (result != 0)
                 {
@@ -410,7 +409,7 @@ namespace AhDung
             if (!UpdateLayeredWindow(_hWnd,
                 IntPtr.Zero, LocationInternal, _size,
                 _dcMemory, PointOrSize.Empty,
-                0, _blend, 2/*ULW_ALPHA*/))
+                0, ref _blend, 2/*ULW_ALPHA*/))
             {
                 //忽略窗体句柄无效ERROR_INVALID_WINDOW_HANDLE
                 if (Marshal.GetLastWin32Error() == 0x578) { return; }
@@ -445,11 +444,14 @@ namespace AhDung
 
         protected virtual void Dispose(bool disposing)
         {
-            lock (this)
+            lock (syncObj)
             {
                 if (_disposed) { return; }
 
-                //if (disposing) { }
+                if (disposing)
+                {
+                    Tag = null;
+                }
 
                 //销毁窗体
                 Debug.WriteLineIf(!DestroyWindow(_hWnd), "Failed", "DestroyWindow");
@@ -458,14 +460,21 @@ namespace AhDung
                 //注销窗口类
                 //窗口类是共用的，每个实例都尝试注册和注销
                 //实际效果就是先开的注册，后关的注销
-                if (UnregisterClass(ClassName, HInstance))
+                if (_wndClass != 0)
                 {
-                    _wndProc = null;//只有注销成功时才解绑窗口过程
+                    if (UnregisterClass(ClassName, HInstance))
+                    {
+                        _wndProc = null;//只有注销成功时才解绑窗口过程
+                    }
+                    _wndClass = 0;
                 }
-                _wndClass = 0;
 
-                Debug.WriteLineIf(!DeleteObject(_hBmp), "Failed", "Delete _hBmp");
+                Debug.WriteLineIf(SelectObject(_dcMemory, _oldObj) == IntPtr.Zero, "Failed", "Restore _oldObj");
                 Debug.WriteLineIf(!DeleteDC(_dcMemory), "Failed", "Delete _dcMemory");
+                Debug.WriteLineIf(!DeleteObject(_hBmp), "Failed", "Delete _hBmp");
+                _oldObj = IntPtr.Zero;
+                _dcMemory = IntPtr.Zero;
+                _hBmp = IntPtr.Zero;
 
                 _disposed = true;
             }
@@ -524,7 +533,7 @@ namespace AhDung
         private static extern IntPtr CreateWindowEx(int dwExStyle, string lpClassName, string lpWindowName, int dwStyle, int x, int y, int nWidth, int nHeight, IntPtr hWndParent, IntPtr hMenu, IntPtr hInstance, IntPtr lpParam);
 
         [DllImport("user32.dll", SetLastError = true)]
-        private static extern bool UpdateLayeredWindow(IntPtr hWnd, IntPtr hdcDst, PointOrSize pptDst, PointOrSize pSizeDst, IntPtr hdcSrc, PointOrSize pptSrc, int crKey, BLENDFUNCTION pBlend, int dwFlags);
+        private static extern bool UpdateLayeredWindow(IntPtr hWnd, IntPtr hdcDst, PointOrSize pptDst, PointOrSize pSizeDst, IntPtr hdcSrc, PointOrSize pptSrc, int crKey, ref BLENDFUNCTION pBlend, int dwFlags);
 
         [DllImport("gdi32.dll", SetLastError = true)]
         private static extern IntPtr CreateCompatibleDC(IntPtr hDC);
@@ -539,6 +548,7 @@ namespace AhDung
         // ReSharper disable FieldCanBeMadeReadOnly.Local
         // ReSharper disable MemberCanBePrivate.Local
         // ReSharper disable UnusedField.Compiler
+#pragma warning disable 414
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         private class WNDCLASS
         {
@@ -555,7 +565,7 @@ namespace AhDung
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        private class BLENDFUNCTION
+        private struct BLENDFUNCTION
         {
             public byte BlendOp;
             public byte BlendFlags;
@@ -595,6 +605,7 @@ namespace AhDung
         // ReSharper restore MemberCanBePrivate.Local
         // ReSharper restore FieldCanBeMadeReadOnly.Local
         // ReSharper restore NotAccessedField.Local
+#pragma warning restore 414
         #endregion
     }
 }

@@ -28,3 +28,4 @@ _ReSharper*/
 *.vssscc
 $tf*/
 Fm[0-9].*
+.vs/

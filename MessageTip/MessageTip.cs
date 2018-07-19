@@ -98,10 +98,10 @@ namespace AhDung
         /// </summary>
         /// <param name="controlOrItem">控件或工具栏项</param>
         /// <param name="text">消息文本</param>
-        /// <param name="delay">消息停留时长(ms)。为负时使用全局时长</param>
-        /// <param name="floating">是否漂浮，不指定则使用全局设置</param>
+        /// <param name="delay">消息停留时长(ms)。默认1秒，若要使用全局时长请设为-1</param>
+        /// <param name="floating">是否漂浮。默认不漂浮。若要使用全局设置请设为null</param>
         /// <param name="centerInControl">是否在控件中央显示，不指定则自动判断</param>
-        public static void ShowWarning(Component controlOrItem, string text = null, int delay = -1, bool? floating = null, bool? centerInControl = null)
+        public static void ShowWarning(Component controlOrItem, string text = null, int delay = 1000, bool? floating = false, bool? centerInControl = null)
         {
             Show(controlOrItem, text, WarningStyle ?? TipStyle.Orange, delay, floating, centerInControl);
         }
@@ -110,11 +110,11 @@ namespace AhDung
         /// 显示警告消息
         /// </summary>
         /// <param name="text">消息文本</param>
-        /// <param name="delay">消息停留时长(ms)。为负时使用全局时长</param>
-        /// <param name="floating">是否漂浮，不指定则使用全局设置</param>
+        /// <param name="delay">消息停留时长(ms)。默认1秒，若要使用全局时长请设为-1</param>
+        /// <param name="floating">是否漂浮。默认不漂浮。若要使用全局设置请设为null</param>
         /// <param name="point">消息窗显示位置。不指定则智能判定，当由工具栏项(ToolStripItem)弹出时，请指定该参数或使用接收控件的重载</param>
         /// <param name="centerByPoint">是否以point参数为中心进行呈现。为false则是在其附近呈现</param>
-        public static void ShowWarning(string text = null, int delay = -1, bool? floating = null, Point? point = null, bool centerByPoint = false)
+        public static void ShowWarning(string text = null, int delay = 1000, bool? floating = false, Point? point = null, bool centerByPoint = false)
         {
             Show(text, WarningStyle ?? TipStyle.Orange, delay, floating, point, centerByPoint);
         }
@@ -124,10 +124,10 @@ namespace AhDung
         /// </summary>
         /// <param name="controlOrItem">控件或工具栏项</param>
         /// <param name="text">消息文本</param>
-        /// <param name="delay">消息停留时长(ms)。为负时使用全局时长</param>
-        /// <param name="floating">是否漂浮，不指定则使用全局设置</param>
+        /// <param name="delay">消息停留时长(ms)。默认1秒，若要使用全局时长请设为-1</param>
+        /// <param name="floating">是否漂浮。默认不漂浮。若要使用全局设置请设为null</param>
         /// <param name="centerInControl">是否在控件中央显示，不指定则自动判断</param>
-        public static void ShowError(Component controlOrItem, string text = null, int delay = -1, bool? floating = null, bool? centerInControl = null)
+        public static void ShowError(Component controlOrItem, string text = null, int delay = 1000, bool? floating = false, bool? centerInControl = null)
         {
             Show(controlOrItem, text, ErrorStyle ?? TipStyle.Red, delay, floating, centerInControl);
         }
@@ -136,11 +136,11 @@ namespace AhDung
         /// 显示出错消息
         /// </summary>
         /// <param name="text">消息文本</param>
-        /// <param name="delay">消息停留时长(ms)。为负时使用全局时长</param>
-        /// <param name="floating">是否漂浮，不指定则使用全局设置</param>
+        /// <param name="delay">消息停留时长(ms)。默认1秒，若要使用全局时长请设为-1</param>
+        /// <param name="floating">是否漂浮。默认不漂浮。若要使用全局设置请设为null</param>
         /// <param name="point">消息窗显示位置。不指定则智能判定，当由工具栏项(ToolStripItem)弹出时，请指定该参数或使用接收控件的重载</param>
         /// <param name="centerByPoint">是否以point参数为中心进行呈现。为false则是在其附近呈现</param>
-        public static void ShowError(string text = null, int delay = -1, bool? floating = null, Point? point = null, bool centerByPoint = false)
+        public static void ShowError(string text = null, int delay = 1000, bool? floating = false, Point? point = null, bool centerByPoint = false)
         {
             Show(text, ErrorStyle ?? TipStyle.Red, delay, floating, point, centerByPoint);
         }
@@ -509,10 +509,4 @@ namespace AhDung
 
         #endregion
     }
-}
-
-//for .net2.0，若VS版本低于2010，请删除in/out关键字，不影响
-namespace System
-{
-    public delegate TResult Func<in T, out TResult>(T arg);
 }

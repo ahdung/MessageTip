@@ -42,7 +42,7 @@ namespace AhDung
         public static TipStyle ErrorStyle { get; set; }
 
         /// <summary>
-        /// 获取或设置淡入淡出时长（毫秒）。默认100
+        /// 获取或设置全局淡入淡出时长（毫秒）。默认100
         /// </summary>
         public static int Fade { get; set; }
 
@@ -54,13 +54,13 @@ namespace AhDung
         /// <summary>
         /// 全局消息停留时长（毫秒）。默认600
         /// </summary>
-        public static int DefaultDelay { get; set; }
+        public static int Delay { get; set; }
 
         static MessageTip()
         {
             Fade = 100;
             Floating = true;
-            DefaultDelay = 600;
+            Delay = 600;
             DefaultStyle = TipStyle.Gray;
             OkStyle = TipStyle.Green;
             WarningStyle = TipStyle.Orange;
@@ -214,7 +214,7 @@ namespace AhDung
                 }
             }) { IsBackground = true, Name = "T_Showing" }.Start(new object[]
             {
-                basePoint, style, delay<0?DefaultDelay:delay,floating??Floating, centerByPoint
+                basePoint, style, delay<0?Delay:delay,floating??Floating, centerByPoint
             });
         }
 

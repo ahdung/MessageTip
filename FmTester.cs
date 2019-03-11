@@ -22,7 +22,7 @@ namespace AhDung
 
         private void nudDelay_ValueChanged(object sender, EventArgs e)
         {
-            MessageTip.DefaultDelay = decimal.ToInt32(nudDelay.Value);
+            MessageTip.Delay = decimal.ToInt32(nudDelay.Value);
         }
 
         private void nudFade_ValueChanged(object sender, EventArgs e)

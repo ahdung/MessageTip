@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Runtime.CompilerServices;
 
 namespace AhDung.Drawing
 {
@@ -59,18 +60,23 @@ namespace AhDung.Drawing
         }
 
         readonly Pen _pen;
+
         /// <summary>
         /// 获取用于画本边框的画笔。建议销毁本类而不是该画笔
         /// </summary>
-        public Pen Pen { get { return _pen; } }
+        public Pen Pen
+        {
+            [MethodImpl(MethodImplOptions.Synchronized)]
+            get => _pen;
+        }
 
         /// <summary>
         /// 边框宽度。默认1
         /// </summary>
         public int Width
         {
-            get { return (int)_pen.Width / 2; }
-            set { _pen.Width = value * 2; }
+            get => (int)Pen.Width / 2;
+            set => Pen.Width = value * 2;
         }
 
         /// <summary>
@@ -78,8 +84,8 @@ namespace AhDung.Drawing
         /// </summary>
         public Color Color
         {
-            get { return _pen.Color; }
-            set { _pen.Color = value; }
+            get => Pen.Color;
+            set => Pen.Color = value;
         }
 
         Direction _direction;
@@ -88,12 +94,12 @@ namespace AhDung.Drawing
         /// </summary>
         public Direction Direction
         {
-            get { return _direction; }
+            get => _direction;
             set
             {
                 if (_direction == value) { return; }
                 _direction = value;
-                _pen.CompoundArray = CompoundArray;
+                Pen.CompoundArray = CompoundArray;
             }
         }
 
@@ -138,22 +144,14 @@ namespace AhDung.Drawing
         /// <summary>
         /// 是否有效边框。无宽度或完全透明视为无效
         /// </summary>
-        public bool IsValid()
-        {
-            return Width > 0 && (_pen.PenType != PenType.SolidColor || Color.A > 0);
-        }
+        public bool IsValid() => Width > 0 && (Pen.PenType != PenType.SolidColor || Color.A > 0);
 
         /// <summary>
         /// 是否有效边框。无宽度或完全透明视为无效
         /// </summary>
-        public static bool IsValid(Border border)
-        {
-            return border != null && border.IsValid();
-        }
+        public static bool IsValid(Border border) => border != null && border.IsValid();
 
-        public void Dispose()
-        {
-            if (_pen != null) { _pen.Dispose(); }
-        }
+        /// <inheritdoc />
+        public void Dispose() => Pen?.Dispose();
     }
 }

@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
@@ -75,10 +76,8 @@ namespace AhDung
         /// <param name="delay">消息停留时长(ms)。为负时使用全局时长</param>
         /// <param name="floating">是否漂浮，不指定则使用全局设置</param>
         /// <param name="centerInControl">是否在控件中央显示，不指定则自动判断</param>
-        public static void ShowOk(Component controlOrItem, string text = null, int delay = -1, bool? floating = null, bool? centerInControl = null)
-        {
+        public static void ShowOk(Component controlOrItem, string text = null, int delay = -1, bool? floating = null, bool? centerInControl = null) =>
             Show(controlOrItem, text, OkStyle ?? TipStyle.Green, delay, floating, centerInControl);
-        }
 
         /// <summary>
         /// 显示良好消息
@@ -88,10 +87,8 @@ namespace AhDung
         /// <param name="floating">是否漂浮，不指定则使用全局设置</param>
         /// <param name="point">消息窗显示位置。不指定则智能判定，当由工具栏项(ToolStripItem)弹出时，请指定该参数或使用接收控件的重载</param>
         /// <param name="centerByPoint">是否以point参数为中心进行呈现。为false则是在其附近呈现</param>
-        public static void ShowOk(string text = null, int delay = -1, bool? floating = null, Point? point = null, bool centerByPoint = false)
-        {
+        public static void ShowOk(string text = null, int delay = -1, bool? floating = null, Point? point = null, bool centerByPoint = false) =>
             Show(text, OkStyle ?? TipStyle.Green, delay, floating, point, centerByPoint);
-        }
 
         /// <summary>
         /// 在指定控件附近显示警告消息
@@ -101,10 +98,8 @@ namespace AhDung
         /// <param name="delay">消息停留时长(ms)。默认1秒，若要使用全局时长请设为-1</param>
         /// <param name="floating">是否漂浮。默认不漂浮。若要使用全局设置请设为null</param>
         /// <param name="centerInControl">是否在控件中央显示，不指定则自动判断</param>
-        public static void ShowWarning(Component controlOrItem, string text = null, int delay = 1000, bool? floating = false, bool? centerInControl = null)
-        {
+        public static void ShowWarning(Component controlOrItem, string text = null, int delay = 1000, bool? floating = false, bool? centerInControl = null) =>
             Show(controlOrItem, text, WarningStyle ?? TipStyle.Orange, delay, floating, centerInControl);
-        }
 
         /// <summary>
         /// 显示警告消息
@@ -114,10 +109,8 @@ namespace AhDung
         /// <param name="floating">是否漂浮。默认不漂浮。若要使用全局设置请设为null</param>
         /// <param name="point">消息窗显示位置。不指定则智能判定，当由工具栏项(ToolStripItem)弹出时，请指定该参数或使用接收控件的重载</param>
         /// <param name="centerByPoint">是否以point参数为中心进行呈现。为false则是在其附近呈现</param>
-        public static void ShowWarning(string text = null, int delay = 1000, bool? floating = false, Point? point = null, bool centerByPoint = false)
-        {
+        public static void ShowWarning(string text = null, int delay = 1000, bool? floating = false, Point? point = null, bool centerByPoint = false) =>
             Show(text, WarningStyle ?? TipStyle.Orange, delay, floating, point, centerByPoint);
-        }
 
         /// <summary>
         /// 在指定控件附近显示出错消息
@@ -127,10 +120,8 @@ namespace AhDung
         /// <param name="delay">消息停留时长(ms)。默认1秒，若要使用全局时长请设为-1</param>
         /// <param name="floating">是否漂浮。默认不漂浮。若要使用全局设置请设为null</param>
         /// <param name="centerInControl">是否在控件中央显示，不指定则自动判断</param>
-        public static void ShowError(Component controlOrItem, string text = null, int delay = 1000, bool? floating = false, bool? centerInControl = null)
-        {
+        public static void ShowError(Component controlOrItem, string text = null, int delay = 1000, bool? floating = false, bool? centerInControl = null) =>
             Show(controlOrItem, text, ErrorStyle ?? TipStyle.Red, delay, floating, centerInControl);
-        }
 
         /// <summary>
         /// 显示出错消息
@@ -140,10 +131,8 @@ namespace AhDung
         /// <param name="floating">是否漂浮。默认不漂浮。若要使用全局设置请设为null</param>
         /// <param name="point">消息窗显示位置。不指定则智能判定，当由工具栏项(ToolStripItem)弹出时，请指定该参数或使用接收控件的重载</param>
         /// <param name="centerByPoint">是否以point参数为中心进行呈现。为false则是在其附近呈现</param>
-        public static void ShowError(string text = null, int delay = 1000, bool? floating = false, Point? point = null, bool centerByPoint = false)
-        {
+        public static void ShowError(string text = null, int delay = 1000, bool? floating = false, Point? point = null, bool centerByPoint = false) =>
             Show(text, ErrorStyle ?? TipStyle.Red, delay, floating, point, centerByPoint);
-        }
 
         /// <summary>
         /// 在指定控件附近显示消息
@@ -158,7 +147,7 @@ namespace AhDung
         {
             if (controlOrItem == null)
             {
-                throw new ArgumentNullException("controlOrItem");
+                throw new ArgumentNullException(nameof(controlOrItem));
             }
             Show(text, style, delay, floating, GetCenterPosition(controlOrItem), centerInControl ?? IsContainerLike(controlOrItem));
         }
@@ -178,26 +167,16 @@ namespace AhDung
 
             new Thread(arg =>
             {
-                var args = (object[])arg;
-                var tBasePoint = (Point)args[0];
-                var tStyle = (TipStyle)args[1];
-                var tDelay = (int)args[2];
-                var tFloating = (bool)args[3];
-                var tCenterByPoint = (bool)args[4];
-
                 LayeredWindow layer = null;
                 try
                 {
-                    bool floatDown;
-                    Rectangle contentBounds;
-
-                    layer = new LayeredWindow(CreateTipImage(text ?? string.Empty, tStyle ?? DefaultStyle ?? TipStyle.Gray, out contentBounds))
+                    layer = new LayeredWindow(CreateTipImage(text ?? string.Empty, style ?? DefaultStyle ?? TipStyle.Gray, out Rectangle contentBounds))
                     {
                         Alpha = 0,
-                        Location = GetLocation(contentBounds, tBasePoint, tCenterByPoint, out floatDown),
+                        Location = GetLocation(contentBounds, basePoint, centerByPoint, out var floatDown),
                         MouseThrough = true,
                         TopMost = true,
-                        Tag = new object[] { tDelay, tFloating, floatDown }
+                        Tag = new object[] { delay < 0 ? Delay : delay, floating ?? Floating, floatDown }
                     };
                     layer.Showing += layer_Showing;
                     layer.Closing += layer_Closing;
@@ -212,10 +191,8 @@ namespace AhDung
                         layer.Dispose();
                     }
                 }
-            }) { IsBackground = true, Name = "T_Showing" }.Start(new object[]
-            {
-                basePoint, style, delay<0?Delay:delay,floating??Floating, centerByPoint
-            });
+            })
+            { IsBackground = true, Name = "T_Showing" }.Start();
         }
 
         static void layer_Showing(object sender, EventArgs e)
@@ -224,23 +201,21 @@ namespace AhDung
             var args = layer.Tag as object[];
             var delay = (int)args[0];
             var floating = (bool)args[1];
-            var floatDown = args[2];
+            var floatDown = (bool)args[2];
 
             if (floating)
             {
                 //另起线程浮动窗体
                 new Thread(arg =>
                 {
-                    var tArgs = (object[])arg;
-                    int adj = ((bool)tArgs[0]) ? 1 : -1;
-                    var tLayer = (LayeredWindow)tArgs[1];
+                    int adj = floatDown ? 1 : -1;
 
-                    while (tLayer.Visible)//layer.IsDisposed有lock，不适合此循环
+                    while (layer.Visible) //layer.IsDisposed有lock，不适合此循环
                     {
-                        tLayer.Top += adj;
+                        layer.Top += adj;
                         Thread.Sleep(30);
                     }
-                }) { IsBackground = true, Name = "T_Floating" }.Start(new[] { floatDown, layer });
+                }) { IsBackground = true, Name = "T_Floating" }.Start();
             }
 
             FadeEffect(layer, true);
@@ -248,17 +223,15 @@ namespace AhDung
             layer.Close();
         }
 
-        static void layer_Closing(object sender, CancelEventArgs e)
-        {
+        static void layer_Closing(object sender, CancelEventArgs e) =>
             FadeEffect((LayeredWindow)sender, false);
-        }
 
         /// <summary>
         /// 淡入淡出处理
         /// </summary>
         private static void FadeEffect(LayeredWindow window, bool fadeIn)
         {
-            byte target = fadeIn ? Byte.MaxValue : Byte.MinValue;
+            byte target = fadeIn ? byte.MaxValue : byte.MinValue;
             const int Updateinterval = 10;//动画更新间隔（毫秒）
             int step = Fade < Updateinterval ? 0 : (Fade / Updateinterval);
 
@@ -299,6 +272,7 @@ namespace AhDung
         /// <summary>
         /// 创建消息窗图像，同时输出内容区，用于外部定位
         /// </summary>
+        [MethodImpl(MethodImplOptions.Synchronized)] //避免争用style中的图标画笔等资源，否则在同时调用时容易引发资源占用异常
         private static Bitmap CreateTipImage(string text, TipStyle style, out Rectangle contentBounds)
         {
             var size = Size.Empty;
@@ -381,9 +355,9 @@ namespace AhDung
             }
             finally
             {
-                if (g != null) { g.Dispose(); }
-                if (backBrush != null) { backBrush.Dispose(); }
-                if (textBrush != null) { textBrush.Dispose(); }
+                g?.Dispose();
+                backBrush?.Dispose();
+                textBrush?.Dispose();
             }
         }
 
@@ -446,20 +420,20 @@ namespace AhDung
         /// </summary>
         private static Point GetCenterPosition(Component controlOrItem)
         {
-            Control c = controlOrItem as Control;
-            if (c != null)
+            if (controlOrItem is Control c)
             {
                 var size = c.ClientSize;
                 return c.PointToScreen(new Point(size.Width / 2, size.Height / 2));
             }
-            var item = controlOrItem as ToolStripItem;
-            if (item != null)
+
+            if (controlOrItem is ToolStripItem item)
             {
                 var pos = item.Bounds.Location;
                 pos.X += item.Width / 2;
                 pos.Y += item.Height / 2;
                 return item.Owner.PointToScreen(pos);
             }
+
             throw new ArgumentException("参数只能是Control或ToolStripItem！");
         }
 
@@ -480,11 +454,15 @@ namespace AhDung
                 return true;
             }
 
-            TextBox txb = controlOrItem as TextBox;
-            if (txb != null && txb.Multiline) { return true; }
+            if (controlOrItem is TextBox txb && txb.Multiline)
+            {
+                return true;
+            }
 
-            RichTextBox rtb = controlOrItem as RichTextBox;
-            if (rtb != null && rtb.Multiline) { return true; }
+            if (controlOrItem is RichTextBox rtb && rtb.Multiline)
+            {
+                return true;
+            }
 
             return false;
         }
@@ -496,8 +474,7 @@ namespace AhDung
         /// </summary>
         private static Point GetCaretPosition()
         {
-            Point pt;
-            GetCaretPos(out pt);
+            GetCaretPos(out Point pt);
             return pt;
         }
 

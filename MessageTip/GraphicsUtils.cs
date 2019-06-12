@@ -25,10 +25,8 @@ namespace AhDung.Drawing
         /// <summary>
         /// 测量文本区尺寸
         /// </summary>
-        public static SizeF MeasureString(string text, Font font, int width = 0, StringFormat stringFormat = null)
-        {
-            return MeasureString(text, font, new SizeF(width, width > 0 ? 999999 : 0), stringFormat);
-        }
+        public static SizeF MeasureString(string text, Font font, int width = 0, StringFormat stringFormat = null) =>
+            MeasureString(text, font, new SizeF(width, width > 0 ? 999999 : 0), stringFormat);
 
         /// <summary>
         /// 测量文本区尺寸
@@ -47,7 +45,7 @@ namespace AhDung.Drawing
             }
             finally
             {
-                if (g != null) { g.Dispose(); }
+                g?.Dispose();
                 if (dcScreen != IntPtr.Zero)
                 {
                     ReleaseDC(IntPtr.Zero, dcScreen);
@@ -118,8 +116,8 @@ namespace AhDung.Drawing
             }
             finally
             {
-                if (path != null) { path.Dispose(); }
-                if (shadow != null) { shadow.Dispose(); }
+                path?.Dispose();
+                shadow?.Dispose();
             }
         }
 
@@ -215,10 +213,7 @@ namespace AhDung.Drawing
             /// <param name="radius">模糊半径</param>
             public static Bitmap Create(GraphicsPath path, Color color, int radius = 5)
             {
-                //得到阴影区并创建位图
-                Rectangle pathBounds;
-                int inflate;
-                var bounds = GetBounds(path, radius, out pathBounds, out inflate);
+                var bounds = GetBounds(path, radius, out Rectangle pathBounds, out int inflate);
                 var shadow = new Bitmap(bounds.Width, bounds.Height);
 
                 if (color.A == 0)
@@ -247,10 +242,10 @@ namespace AhDung.Drawing
                 }
                 finally
                 {
-                    if (g != null) { g.Dispose(); }
-                    if (brush != null) { brush.Dispose(); }
-                    if (pathCopy != null) { pathCopy.Dispose(); }
-                    if (matrix != null) { matrix.Dispose(); }
+                    g?.Dispose();
+                    brush?.Dispose();
+                    pathCopy?.Dispose();
+                    matrix?.Dispose();
                 }
 
                 if (radius <= 0)
@@ -283,13 +278,13 @@ namespace AhDung.Drawing
             /// <param name="data">图像内存数据</param>
             /// <param name="radius">模糊半径</param>
             /// <param name="color">透明色值</param>
-#if UNSSAFE
+#if UNSAFE
             private static unsafe void BoxBlur(BitmapData data, int radius, Color color)
 #else
             private static void BoxBlur(BitmapData data, int radius, Color color)
 #endif
             {
-#if UNSSAFE //unsafe项目下请定义编译条件：UNSAFE
+#if UNSAFE //unsafe项目下请定义编译条件：UNSAFE
                 IntPtr p1 = data1.Scan0;
 #else
                 byte[] p1 = new byte[data.Stride * data.Height];
@@ -310,12 +305,12 @@ namespace AhDung.Drawing
                     }
                 }
 
-                byte[] p2 = new byte[p1.Length];
+                byte[] p2   = new byte[p1.Length];
                 int radius2 = 2 * radius + 1;
                 int First, Last, Sum;
-                int stride = data.Stride,
-                    width = data.Width,
-                    height = data.Height;
+                int stride  = data.Stride,
+                    width   = data.Width,
+                    height  = data.Height;
 
                 //只处理Alpha通道
 

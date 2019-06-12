@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using AhDung.Drawing;
 
@@ -16,14 +17,10 @@ namespace AhDung
         bool _keepIcon;
 
         readonly Border _border;
-
         /// <summary>
         /// 获取边框信息。内部用
         /// </summary>
-        internal Border Border
-        {
-            get { return _border; }
-        }
+        internal Border Border => _border;
 
         /// <summary>
         /// 获取或设置图标。默认null
@@ -69,8 +66,8 @@ namespace AhDung
         /// </summary>
         public Color BorderColor
         {
-            get { return _border.Color; }
-            set { _border.Color = value; }
+            get => _border.Color;
+            set => _border.Color = value;
         }
 
         /// <summary>
@@ -78,8 +75,8 @@ namespace AhDung
         /// </summary>
         public int BorderWidth
         {
-            get { return _border.Width / 2; }
-            set { _border.Width = value * 2; }
+            get => _border.Width / 2;
+            set => _border.Width = value * 2;
         }
 
         /// <summary>
@@ -146,37 +143,25 @@ namespace AhDung
         /// <summary>
         /// 预置的灰色样式
         /// </summary>
-        public static TipStyle Gray
-        {
-            get { return _gray ?? (_gray = CreatePresetsStyle(0)); }
-        }
+        public static TipStyle Gray => _gray ?? (_gray = CreatePresetsStyle(0));
 
         static TipStyle _green;
         /// <summary>
         /// 预置的绿色样式
         /// </summary>
-        public static TipStyle Green
-        {
-            get { return _green ?? (_green = CreatePresetsStyle(1)); }
-        }
+        public static TipStyle Green => _green ?? (_green = CreatePresetsStyle(1));
 
         static TipStyle _orange;
         /// <summary>
         /// 预置的橙色样式
         /// </summary>
-        public static TipStyle Orange
-        {
-            get { return _orange ?? (_orange = CreatePresetsStyle(2)); }
-        }
+        public static TipStyle Orange => _orange ?? (_orange = CreatePresetsStyle(2));
 
         static TipStyle _red;
         /// <summary>
         /// 预置的红色样式
         /// </summary>
-        public static TipStyle Red
-        {
-            get { return _red ?? (_red = CreatePresetsStyle(3)); }
-        }
+        public static TipStyle Red => _red ?? (_red = CreatePresetsStyle(3));
 
         private static TipStyle CreatePresetsStyle(int index)
         {
@@ -201,30 +186,28 @@ namespace AhDung
 
         bool _disposed;
         [Obsolete("请改用Clear指定是否清理字体和图标")]
+        [MethodImpl(MethodImplOptions.Synchronized)]
         void IDisposable.Dispose()
         {
-            lock (this)
+            if (_disposed || _isPresets)//不销毁预置对象
             {
-                if (_disposed || _isPresets)//不销毁预置对象
-                {
-                    return;
-                }
-
-                _border.Dispose();
-                BackBrush = null;
-                if (!_keepFont && TextFont != null && !TextFont.IsSystemFont)
-                {
-                    TextFont.Dispose();
-                    TextFont = null;
-                }
-                if (!_keepIcon && Icon != null)
-                {
-                    Icon.Dispose();
-                    Icon = null;
-                }
-
-                _disposed = true;
+                return;
             }
+
+            _border.Dispose();
+            BackBrush = null;
+            if (!_keepFont && TextFont != null && !TextFont.IsSystemFont)
+            {
+                TextFont.Dispose();
+                TextFont = null;
+            }
+            if (!_keepIcon && Icon != null)
+            {
+                Icon.Dispose();
+                Icon = null;
+            }
+
+            _disposed = true;
         }
 
         /// <summary>
@@ -309,14 +292,14 @@ namespace AhDung
                 }
                 catch
                 {
-                    if (bmp != null) { bmp.Dispose(); }
+                    bmp?.Dispose();
                     throw;
                 }
                 finally
                 {
-                    if (pen != null) { pen.Dispose(); }
-                    if (brush != null) { brush.Dispose(); }
-                    if (g != null) { g.Dispose(); }
+                    pen?.Dispose();
+                    brush?.Dispose();
+                    g?.Dispose();
                 }
             }
         }

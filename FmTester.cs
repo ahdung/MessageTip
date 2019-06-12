@@ -9,7 +9,7 @@ namespace AhDung
 
         public FmTester()
         {
-            this.DoubleBuffered = true;
+            DoubleBuffered = true;
             InitializeComponent();
             _style = new TipStyle();
             propertyGrid1.SelectedObject = _style;

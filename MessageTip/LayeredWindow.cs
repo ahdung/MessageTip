@@ -62,15 +62,12 @@ namespace AhDung
         /// <summary>
         /// 获取窗体位置。内部用
         /// </summary>
-        PointOrSize LocationInternal
-        {
-            get { return new PointOrSize(_left, _top); }
-        }
+        PointOrSize LocationInternal => new PointOrSize(_left, _top);
 
         /// <summary>
         /// 窗体句柄
         /// </summary>
-        public IntPtr Handle { get { return _hWnd; } }
+        public IntPtr Handle => _hWnd;
 
         /// <summary>
         /// 指示窗体是否已显示
@@ -83,7 +80,7 @@ namespace AhDung
         /// </summary>
         public int Left
         {
-            get { return _left; }
+            get => _left;
             set
             {
                 if (_left == value) { return; }
@@ -98,7 +95,7 @@ namespace AhDung
         /// </summary>
         public int Top
         {
-            get { return _top; }
+            get => _top;
             set
             {
                 if (_top == value) { return; }
@@ -112,7 +109,7 @@ namespace AhDung
         /// </summary>
         public Point Location
         {
-            get { return new Point(_left, _top); }
+            get => new Point(_left, _top);
             set
             {
                 if (_left == value.X && _top == value.Y) { return; }
@@ -138,7 +135,7 @@ namespace AhDung
         /// </summary>
         public float Opacity
         {
-            get { return _opacity; }
+            get => _opacity;
             set
             {
                 if (_opacity.Equals(value)) { return; }
@@ -155,7 +152,7 @@ namespace AhDung
         /// </summary>
         public byte Alpha
         {
-            get { return _blend.SourceConstantAlpha; }
+            get => _blend.SourceConstantAlpha;
             set
             {
                 if (_blend.SourceConstantAlpha == value) { return; }
@@ -324,10 +321,8 @@ namespace AhDung
             return DefWndProc(hWnd, msg, wParam, lParam);
         }
 
-        protected virtual IntPtr DefWndProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam)
-        {
-            return DefWindowProc(hWnd, msg, wParam, lParam);
-        }
+        protected virtual IntPtr DefWndProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam) =>
+            DefWindowProc(hWnd, msg, wParam, lParam);
 
         private void ShowCore(bool modal)
         {
@@ -366,35 +361,23 @@ namespace AhDung
         /// <summary>
         /// 显示窗体
         /// </summary>
-        public void Show()
-        {
-            ShowCore(false);
-        }
+        public void Show() => ShowCore(false);
 
         /// <summary>
         /// 显示模式窗体
         /// </summary>
-        public void ShowDialog()
-        {
-            ShowCore(true);
-        }
+        public void ShowDialog() => ShowCore(true);
 
         protected virtual void OnShowing(EventArgs e)
         {
             var handle = Showing;
-            if (handle != null)
-            {
-                handle(this, e);
-            }
+            handle?.Invoke(this, e);
         }
 
         protected virtual void OnClosing(CancelEventArgs e)
         {
             var handle = Closing;
-            if (handle != null)
-            {
-                handle(this, e);
-            }
+            handle?.Invoke(this, e);
         }
 
         /// <summary>
@@ -428,7 +411,7 @@ namespace AhDung
             if (!e.Cancel)
             {
                 Visible = false;
-                this.Dispose();
+                Dispose();
             }
         }
 
@@ -549,6 +532,7 @@ namespace AhDung
         // ReSharper disable MemberCanBePrivate.Local
         // ReSharper disable UnusedField.Compiler
 #pragma warning disable 414
+#pragma warning disable 649
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         private class WNDCLASS
         {
@@ -605,6 +589,7 @@ namespace AhDung
         // ReSharper restore MemberCanBePrivate.Local
         // ReSharper restore FieldCanBeMadeReadOnly.Local
         // ReSharper restore NotAccessedField.Local
+#pragma warning restore 649
 #pragma warning restore 414
         #endregion
     }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Runtime.CompilerServices;
 
 namespace AhDung.Drawing
 {
@@ -64,11 +63,7 @@ namespace AhDung.Drawing
         /// <summary>
         /// 获取用于画本边框的画笔。建议销毁本类而不是该画笔
         /// </summary>
-        public Pen Pen
-        {
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            get => _pen;
-        }
+        public Pen Pen => _pen;
 
         /// <summary>
         /// 边框宽度。默认1

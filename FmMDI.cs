@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace AhDung
@@ -14,7 +15,7 @@ namespace AhDung
         {
             new FmTester
             {
-                Text = "Form " + (this.MdiChildren.Length + 1),
+                Text = "Form " + (MdiChildren.Length + 1),
                 MdiParent = this
             }.Show();
         }
@@ -40,6 +41,11 @@ namespace AhDung
         private void btnShow_Click(object sender, EventArgs e)
         {
             MessageTip.ShowOk(txbText.Text);
+            //ThreadPool.QueueUserWorkItem(obj => MessageTip.ShowOk("并行测试"));
+            //ThreadPool.QueueUserWorkItem(obj => MessageTip.ShowOk("并行测试"));
+            //ThreadPool.QueueUserWorkItem(obj => MessageTip.ShowOk("并行测试"));
+            //ThreadPool.QueueUserWorkItem(obj => MessageTip.ShowOk("并行测试"));
+            //ThreadPool.QueueUserWorkItem(obj => MessageTip.ShowOk("并行测试"));
         }
     }
 }

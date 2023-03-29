@@ -7,7 +7,7 @@ namespace AhDung.Drawing
     /// <summary>
     /// 描边位置
     /// </summary>
-    internal enum Direction
+    public enum Direction
     {
         /// <summary>
         /// 居中
@@ -27,7 +27,7 @@ namespace AhDung.Drawing
     /// 存储一系列边框要素并产生合适的画笔
     /// <para>- 边框居中+奇数粗度时是介于两像素之间画，所以粗细在视觉上不精确，建议错开任一条件</para>
     /// </summary>
-    internal class Border : IDisposable
+    public class Border : IDisposable
     {
         //编写本类除了整合边框信息外，更重要的原因是如果不对画笔做额外处理，
         //Draw出来的边框是不理想的。本类的原理是：
@@ -121,7 +121,15 @@ namespace AhDung.Drawing
             return rectangle;
         }
 
-        public Border(Color color) : this(new Pen(color), false) { }
+        /// <summary>
+        /// 指定颜色构造画笔
+        /// </summary>
+        public Border(Color color) : this(color, 1) { }
+
+        /// <summary>
+        /// 指定颜色和宽度构造画笔
+        /// </summary>
+        public Border(Color color, int width) : this(new Pen(color, width), false) { }
 
         /// <summary>
         /// 基于现有画笔的副本构造
@@ -132,7 +140,7 @@ namespace AhDung.Drawing
         {
             _pen = useCopy ? (Pen)pen.Clone() : pen;
             _pen.Alignment = PenAlignment.Center;
-            _pen.Width = Convert.ToInt32(_pen.Width * 2);
+            _pen.Width = _pen.Width * 2;
             _pen.CompoundArray = CompoundArray;
         }
 
@@ -145,6 +153,11 @@ namespace AhDung.Drawing
         /// 是否有效边框。无宽度或完全透明视为无效
         /// </summary>
         public static bool IsValid(Border border) => border != null && border.IsValid();
+
+        /// <summary>
+        /// 确定指定颜色和宽度能否构成有效边框。有效=有色+有宽度
+        /// </summary>
+        public static bool IsValid(Color color, int width) => width > 0 && color.A > 0;
 
         /// <inheritdoc />
         public void Dispose() => Pen?.Dispose();

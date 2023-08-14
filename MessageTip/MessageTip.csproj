@@ -4,6 +4,7 @@
   <PropertyGroup>
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>AhDung</RootNamespace>
+    <AssemblyName>AhDung.$(MSBuildProjectName)</AssemblyName>
     <TargetFrameworks>net20;net40;net48;net6.0-windows</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>false</ImplicitUsings>

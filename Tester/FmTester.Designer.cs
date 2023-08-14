@@ -1,6 +1,6 @@
 ﻿namespace AhDung
 {
-    partial class FmTester
+    sealed partial class FmTester
     {
         /// <summary>
         /// Required designer variable.
@@ -30,7 +30,6 @@
         {
             this.txbMultiline = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.ckbFloating = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
             this.nudDelay = new System.Windows.Forms.NumericUpDown();
             this.btnOk = new System.Windows.Forms.Button();
@@ -66,7 +65,7 @@
             this.txbMultiline.Location = new System.Drawing.Point(14, 155);
             this.txbMultiline.Multiline = true;
             this.txbMultiline.Name = "txbMultiline";
-            this.txbMultiline.Size = new System.Drawing.Size(471, 63);
+            this.txbMultiline.Size = new System.Drawing.Size(467, 63);
             this.txbMultiline.TabIndex = 4;
             this.txbMultiline.Text = "消息可以是多行\r\nThe message can be multiline";
             // 
@@ -78,20 +77,6 @@
             this.label2.Size = new System.Drawing.Size(35, 12);
             this.label2.TabIndex = 3;
             this.label2.Text = "Text:";
-            // 
-            // ckbFloating
-            // 
-            this.ckbFloating.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.ckbFloating.AutoSize = true;
-            this.ckbFloating.Checked = true;
-            this.ckbFloating.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.ckbFloating.Location = new System.Drawing.Point(413, 16);
-            this.ckbFloating.Name = "ckbFloating";
-            this.ckbFloating.Size = new System.Drawing.Size(72, 16);
-            this.ckbFloating.TabIndex = 2;
-            this.ckbFloating.Text = "Floating";
-            this.ckbFloating.UseVisualStyleBackColor = true;
-            this.ckbFloating.CheckedChanged += new System.EventHandler(this.ckbFloating_CheckedChanged);
             // 
             // label3
             // 
@@ -118,11 +103,6 @@
             this.nudDelay.Name = "nudDelay";
             this.nudDelay.Size = new System.Drawing.Size(93, 21);
             this.nudDelay.TabIndex = 0;
-            this.nudDelay.Value = new decimal(new int[] {
-            600,
-            0,
-            0,
-            0});
             this.nudDelay.ValueChanged += new System.EventHandler(this.nudDelay_ValueChanged);
             // 
             // btnOk
@@ -158,7 +138,7 @@
             // btnShow
             // 
             this.btnShow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnShow.Location = new System.Drawing.Point(335, 235);
+            this.btnShow.Location = new System.Drawing.Point(331, 235);
             this.btnShow.Name = "btnShow";
             this.btnShow.Size = new System.Drawing.Size(150, 36);
             this.btnShow.TabIndex = 8;
@@ -203,13 +183,13 @@
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.panel1.Location = new System.Drawing.Point(14, 289);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(339, 122);
+            this.panel1.Size = new System.Drawing.Size(335, 122);
             this.panel1.TabIndex = 10;
             // 
             // btnShowInPanel
             // 
             this.btnShowInPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnShowInPanel.Location = new System.Drawing.Point(359, 289);
+            this.btnShowInPanel.Location = new System.Drawing.Point(355, 289);
             this.btnShowInPanel.Name = "btnShowInPanel";
             this.btnShowInPanel.Size = new System.Drawing.Size(126, 36);
             this.btnShowInPanel.TabIndex = 9;
@@ -223,7 +203,7 @@
             this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.propertyGrid1.Location = new System.Drawing.Point(0, 29);
             this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.Size = new System.Drawing.Size(275, 394);
+            this.propertyGrid1.Size = new System.Drawing.Size(279, 394);
             this.propertyGrid1.TabIndex = 1;
             // 
             // splitContainer1
@@ -246,7 +226,6 @@
             this.splitContainer1.Panel1.Controls.Add(this.panel1);
             this.splitContainer1.Panel1.Controls.Add(this.label5);
             this.splitContainer1.Panel1.Controls.Add(this.label3);
-            this.splitContainer1.Panel1.Controls.Add(this.ckbFloating);
             this.splitContainer1.Panel1.Controls.Add(this.btnShow);
             this.splitContainer1.Panel1.Controls.Add(this.nudFade);
             this.splitContainer1.Panel1.Controls.Add(this.nudDelay);
@@ -259,7 +238,7 @@
             this.splitContainer1.Panel2.Controls.Add(this.propertyGrid1);
             this.splitContainer1.Panel2.Controls.Add(this.btnRestore);
             this.splitContainer1.Size = new System.Drawing.Size(787, 427);
-            this.splitContainer1.SplitterDistance = 502;
+            this.splitContainer1.SplitterDistance = 498;
             this.splitContainer1.SplitterWidth = 6;
             this.splitContainer1.TabIndex = 1;
             // 
@@ -286,7 +265,7 @@
             // 
             this.label6.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(348, 17);
+            this.label6.Location = new System.Drawing.Point(346, 17);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(17, 12);
             this.label6.TabIndex = 3;
@@ -296,7 +275,7 @@
             // 
             this.label5.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(214, 17);
+            this.label5.Location = new System.Drawing.Point(212, 17);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(29, 12);
             this.label5.TabIndex = 3;
@@ -305,7 +284,7 @@
             // nudFade
             // 
             this.nudFade.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.nudFade.Location = new System.Drawing.Point(249, 15);
+            this.nudFade.Location = new System.Drawing.Point(247, 15);
             this.nudFade.Maximum = new decimal(new int[] {
             999999,
             0,
@@ -319,11 +298,6 @@
             this.nudFade.Name = "nudFade";
             this.nudFade.Size = new System.Drawing.Size(93, 21);
             this.nudFade.TabIndex = 1;
-            this.nudFade.Value = new decimal(new int[] {
-            100,
-            0,
-            0,
-            0});
             this.nudFade.ValueChanged += new System.EventHandler(this.nudFade_ValueChanged);
             // 
             // btnRestore
@@ -331,7 +305,7 @@
             this.btnRestore.Dock = System.Windows.Forms.DockStyle.Top;
             this.btnRestore.Location = new System.Drawing.Point(0, 0);
             this.btnRestore.Name = "btnRestore";
-            this.btnRestore.Size = new System.Drawing.Size(275, 29);
+            this.btnRestore.Size = new System.Drawing.Size(279, 29);
             this.btnRestore.TabIndex = 0;
             this.btnRestore.Text = "Custom TipStyle (Click to Restore)";
             this.btnRestore.UseVisualStyleBackColor = true;
@@ -366,7 +340,6 @@
 
         private System.Windows.Forms.TextBox txbMultiline;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.CheckBox ckbFloating;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.NumericUpDown nudDelay;
         private System.Windows.Forms.Button btnOk;

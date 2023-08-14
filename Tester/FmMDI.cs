@@ -11,7 +11,7 @@ namespace AhDung
             InitializeComponent();
         }
 
-        private void btnNewChild_Click(object sender, EventArgs e)
+        void btnNewChild_Click(object sender, EventArgs e)
         {
             new FmTester
             {
@@ -20,17 +20,17 @@ namespace AhDung
             }.Show();
         }
 
-        private void btnNewForm_Click(object sender, EventArgs e)
+        void btnNewForm_Click(object sender, EventArgs e)
         {
             new FmTester().Show();
         }
 
-        private void btnTestItem_Click(object sender, EventArgs e)
+        void btnTestItem_Click(object sender, EventArgs e)
         {
             MessageTip.ShowOk((ToolStripItem)sender, txbText.Text);
         }
 
-        private void txbText_KeyDown(object sender, KeyEventArgs e)
+        void txbText_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
@@ -38,14 +38,19 @@ namespace AhDung
             }
         }
 
-        private void btnShow_Click(object sender, EventArgs e)
+        void btnShow_Click(object sender, EventArgs e)
         {
             MessageTip.ShowOk(txbText.Text);
-            //ThreadPool.QueueUserWorkItem(obj => MessageTip.ShowOk("并行测试"));
-            //ThreadPool.QueueUserWorkItem(obj => MessageTip.ShowOk("并行测试"));
-            //ThreadPool.QueueUserWorkItem(obj => MessageTip.ShowOk("并行测试"));
-            //ThreadPool.QueueUserWorkItem(obj => MessageTip.ShowOk("并行测试"));
-            //ThreadPool.QueueUserWorkItem(obj => MessageTip.ShowOk("并行测试"));
+            //ThreadPool.QueueUserWorkItem(_ => MessageTip.ShowOk("并行测试"));
+            //ThreadPool.QueueUserWorkItem(_ => MessageTip.ShowOk("并行测试"));
+            //ThreadPool.QueueUserWorkItem(_ => MessageTip.ShowOk("并行测试"));
+            //ThreadPool.QueueUserWorkItem(_ => MessageTip.ShowOk("并行测试"));
+            //ThreadPool.QueueUserWorkItem(_ => MessageTip.ShowOk("并行测试"));
+            //ThreadPool.QueueUserWorkItem(_ => MessageTip.ShowOk("并行测试"));
+            //ThreadPool.QueueUserWorkItem(_ => MessageTip.ShowOk("并行测试"));
+            //ThreadPool.QueueUserWorkItem(_ => MessageTip.ShowOk("并行测试"));
+            //ThreadPool.QueueUserWorkItem(_ => MessageTip.ShowOk("并行测试"));
+            //ThreadPool.QueueUserWorkItem(_ => MessageTip.ShowOk("并行测试"));
         }
     }
 }

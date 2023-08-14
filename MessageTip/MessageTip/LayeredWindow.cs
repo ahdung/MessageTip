@@ -18,15 +18,10 @@ public class LayeredWindow : IDisposable
     const  int             DefaultHeight = 200;
     static WndProcDelegate _wndProc;
 
-    readonly object _syncObj         = new();
     readonly Color  _backgroundColor = SystemColors.Control;
-
-    int   _width  = DefaultWidth;
-    int   _height = DefaultHeight;
-    float _opacity;
-    int   _top;
-    int   _left;
-    Image _backgroundImage;
+    int             _top;
+    int             _left;
+    Image           _backgroundImage;
 
     IntPtr _defaultHBmp;
     IntPtr _dcMemory;
@@ -46,8 +41,8 @@ public class LayeredWindow : IDisposable
         AlphaFormat         = 1    //AC_SRC_ALPHA
     };
 
-    bool _disposed;
     bool _visible;
+    bool _layoutSuspended;
 
     /// <summary>
     /// 窗体显示时
@@ -80,7 +75,7 @@ public class LayeredWindow : IDisposable
     /// <summary>
     /// 获取窗体尺寸。内部用
     /// </summary>
-    PointOrSize SizeInternal => new(_width, _height);
+    PointOrSize SizeInternal => new(Width, Height);
 
     /// <summary>
     /// 窗体句柄
@@ -102,7 +97,7 @@ public class LayeredWindow : IDisposable
 
             if (value)
             {
-                Update();
+                TryUpdate();
                 ShowWindow(_hWnd, Activation ? 5 /*SW_SHOW*/ : 8 /*SW_SHOWNA*/);
             }
             else
@@ -121,7 +116,7 @@ public class LayeredWindow : IDisposable
             if (_left != value)
             {
                 _left = value;
-                Update();
+                TryUpdate();
             }
         }
     }
@@ -137,7 +132,7 @@ public class LayeredWindow : IDisposable
             if (_top != value)
             {
                 _top = value;
-                Update();
+                TryUpdate();
             }
         }
     }
@@ -154,7 +149,7 @@ public class LayeredWindow : IDisposable
             {
                 _left = value.X;
                 _top  = value.Y;
-                Update();
+                TryUpdate();
             }
         }
     }
@@ -177,33 +172,27 @@ public class LayeredWindow : IDisposable
     /// <summary>
     /// 获取窗体宽度
     /// </summary>
-    public int Width => _width;
+    public int Width { get; private set; } = DefaultWidth;
 
     /// <summary>
     /// 获取窗体高度
     /// </summary>
-    public int Height => _height;
+    public int Height { get; private set; } = DefaultHeight;
 
     /// <summary>
-    /// 获取或设置窗体透明度（建议优先用Alpha）。0=完全透明；1=不透明
+    /// 获取或设置窗体透明度。0=完全透明；1=不透明
     /// </summary>
+    /// <remarks>系<see cref="Alpha"/>的包装，建议优先用Alpha。</remarks>
+    /// <exception cref="ArgumentOutOfRangeException"/>
     public float Opacity
     {
-        get => _opacity;
+        get => Alpha / 255f;
         set
         {
-            if (_opacity.Equals(value))
-                return;
+            if (value is < 0 or > 1)
+                throw new ArgumentOutOfRangeException();
 
-            _opacity = value switch
-            {
-                < 0 => 0,
-                > 1 => 1,
-                _   => value
-            };
-
-            _blend.SourceConstantAlpha = (byte)(_opacity * 255);
-            Update();
+            Alpha = (byte)(value * 255);
         }
     }
 
@@ -218,12 +207,11 @@ public class LayeredWindow : IDisposable
             if (_blend.SourceConstantAlpha != value)
             {
                 _blend.SourceConstantAlpha = value;
-                Update();
+                TryUpdate();
             }
         }
     }
 
-    // ReSharper disable UnusedAutoPropertyAccessor.Global
     /// <summary>
     /// 获取或设置名称
     /// </summary>
@@ -257,14 +245,7 @@ public class LayeredWindow : IDisposable
     /// <summary>
     /// 指示窗体是否已释放
     /// </summary>
-    public bool IsDisposed
-    {
-        get
-        {
-            lock (_syncObj)
-                return _disposed;
-        }
-    }
+    public bool IsDisposed { get; private set; }
 
     /// <summary>
     /// 获取或设置自定对象
@@ -297,23 +278,22 @@ public class LayeredWindow : IDisposable
 
             if (value == null)
             {
-                _width  = DefaultWidth;
-                _height = DefaultHeight;
+                Width   = DefaultWidth;
+                Height  = DefaultHeight;
                 _oldObj = SelectObject(_dcMemory, _defaultHBmp);
             }
             else
             {
-                _width  = value.Width;
-                _height = value.Height;
+                Width   = value.Width;
+                Height  = value.Height;
                 _hBmp   = ((Bitmap)value).GetHbitmap(Color.Empty);
                 _oldObj = SelectObject(_dcMemory, _hBmp);
             }
 
             _backgroundImage = value;
-            Update();
+            TryUpdate();
         }
     }
-    // ReSharper restore UnusedAutoPropertyAccessor.Global
 
     /// <summary>
     /// 创建层窗体
@@ -331,35 +311,6 @@ public class LayeredWindow : IDisposable
         _defaultHBmp = bmp.GetHbitmap();
         _oldObj      = SelectObject(_dcMemory, _defaultHBmp);
     }
-
-    ///// <summary>
-    ///// 创建层窗体
-    ///// </summary>
-    ///// <param name="bmp">窗体图像</param>
-    ///// <param name="keepBmp">是否保留图像，为false会销毁图像</param>
-    //public LayeredWindow(Bitmap bmp, bool keepBmp = false)
-    //{
-    //    try
-    //    {
-    //        RegisterWindowClass();
-
-    //        //初始化绘制相关
-    //        _dcMemory = CreateCompatibleDC(IntPtr.Zero);
-    //        _hBmp = bmp.GetHbitmap(Color.Empty);
-    //        _oldObj = SelectObject(_dcMemory, _hBmp);
-
-    //        _width = bmp.Width;
-    //        //Height = bmp.Height;
-    //        //_size = new PointOrSize(Width, Height);
-    //    }
-    //    finally
-    //    {
-    //        if (!keepBmp)
-    //        {
-    //            bmp.Dispose();
-    //        }
-    //    }
-    //}
 
     /// <summary>
     /// 注册私有窗口类
@@ -458,23 +409,17 @@ public class LayeredWindow : IDisposable
         if (_visible)
             return;
 
-        lock (_syncObj)
+        if (modal)
         {
-            if (_visible) //拿到锁再判断一次
-                return;
-
-            if (modal)
-            {
-                IsModal       = true;
-                Activation    = true;
-                _activeWindow = GetActiveWindow();
-                EnableWindow(_activeWindow, false);
-            }
-
-            CreateWindow();
-            ShowWindow(_hWnd, Activation ? 5 /*SW_SHOW*/ : 8 /*SW_SHOWNA*/);
-            _visible = true;
+            IsModal       = true;
+            Activation    = true;
+            _activeWindow = GetActiveWindow();
+            EnableWindow(_activeWindow, false);
         }
+
+        CreateWindow();
+        ShowWindow(_hWnd, Activation ? 5 /*SW_SHOW*/ : 8 /*SW_SHOWNA*/);
+        _visible = true;
 
         OnShowing(EventArgs.Empty);
 
@@ -482,7 +427,7 @@ public class LayeredWindow : IDisposable
         if (IsDisposed)
             return;
 
-        Update();
+        TryUpdate();
 
         if (modal)
         {
@@ -508,14 +453,42 @@ public class LayeredWindow : IDisposable
     /// </summary>
     public void Hide() => Visible = false;
 
+    /// <summary>
+    /// 挂起更新
+    /// </summary>
+    public void SuspendLayout() => _layoutSuspended = true;
+
+    /// <summary>
+    /// 取消挂起状态并立即执行一次更新
+    /// </summary>
+    public void ResumeLayout() => ResumeLayout(true);
+
+    /// <summary>
+    /// 取消挂起状态
+    /// </summary>
+    /// <param name="performLayout">是否立即执行一次更新</param>
+    public void ResumeLayout(bool performLayout)
+    {
+        _layoutSuspended = false;
+        if (performLayout)
+            Update();
+    }
+
     protected virtual void OnShowing(EventArgs e) => Showing?.Invoke(this, e);
 
     protected virtual void OnClosing(CancelEventArgs e) => Closing?.Invoke(this, e);
 
+    void TryUpdate()
+    {
+        if (!_layoutSuspended)
+            Update();
+    }
+
     /// <summary>
     /// 更新窗体
     /// </summary>
-    protected virtual void Update()
+    /// <exception cref="Win32Exception"/>
+    public virtual void Update()
     {
         if (!_visible)
             return;
@@ -534,7 +507,7 @@ public class LayeredWindow : IDisposable
     }
 
     /// <summary>
-    /// 关闭并销毁窗体
+    /// 关闭并销毁窗体。须与Show系方法处于同一线程
     /// </summary>
     public void Close()
     {
@@ -548,7 +521,7 @@ public class LayeredWindow : IDisposable
     }
 
     /// <summary>
-    /// 释放窗体
+    /// 释放窗体。须与Show系方法处于同一线程
     /// </summary>
     public void Dispose()
     {
@@ -558,50 +531,43 @@ public class LayeredWindow : IDisposable
 
     protected virtual void Dispose(bool disposing)
     {
-        if (_disposed)
+        if (IsDisposed)
             return;
 
-        lock (_syncObj)
+        Tag = null;
+
+        //销毁窗体
+        DestroyWindow(_hWnd);
+        _hWnd = IntPtr.Zero;
+
+        //注销窗口类
+        //窗口类是共用的，每个实例都尝试注册和注销
+        //实际效果就是先开的注册，后关的注销
+        if (_wndClass != 0)
         {
-            if (_disposed) //拿到锁再判断一次
-                return;
+            if (UnregisterClass(ClassName, HInstance))
+                _wndProc = null; //只有注销成功时才解绑窗口过程
 
-            if (disposing)
-                Tag = null;
-
-            //销毁窗体
-            DestroyWindow(_hWnd);
-            _hWnd = IntPtr.Zero;
-
-            //注销窗口类
-            //窗口类是共用的，每个实例都尝试注册和注销
-            //实际效果就是先开的注册，后关的注销
-            if (_wndClass != 0)
-            {
-                if (UnregisterClass(ClassName, HInstance))
-                    _wndProc = null; //只有注销成功时才解绑窗口过程
-
-                _wndClass = 0;
-            }
-
-            if (_oldObj != IntPtr.Zero)
-                SelectObject(_dcMemory, _oldObj);
-
-            DeleteDC(_dcMemory);
-
-            if (_hBmp != IntPtr.Zero)
-                DeleteObject(_hBmp);
-
-            if (_defaultHBmp != IntPtr.Zero)
-                DeleteObject(_defaultHBmp);
-
-            _oldObj      = IntPtr.Zero;
-            _dcMemory    = IntPtr.Zero;
-            _hBmp        = IntPtr.Zero;
-            _defaultHBmp = IntPtr.Zero;
-
-            _disposed = true;
+            _wndClass = 0;
         }
+
+        if (_oldObj != IntPtr.Zero)
+            SelectObject(_dcMemory, _oldObj);
+
+        DeleteDC(_dcMemory);
+
+        if (_hBmp != IntPtr.Zero)
+            DeleteObject(_hBmp);
+
+        if (_defaultHBmp != IntPtr.Zero)
+            DeleteObject(_defaultHBmp);
+
+        _oldObj      = IntPtr.Zero;
+        _dcMemory    = IntPtr.Zero;
+        _hBmp        = IntPtr.Zero;
+        _defaultHBmp = IntPtr.Zero;
+
+        IsDisposed = true;
     }
 
     ~LayeredWindow()
@@ -629,7 +595,7 @@ public class LayeredWindow : IDisposable
     [DllImport("user32.dll")]
     static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
-    [DllImport("user32.dll", SetLastError = true)]
+    [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
     static extern bool UnregisterClass(string lpClassName, IntPtr hInstance);
 
     [DllImport("user32.dll")]

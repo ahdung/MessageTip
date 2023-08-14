@@ -1,14 +1,16 @@
 ﻿// Copyright (c) AhDung. All Rights Reserved.
 
+using AhDung.Drawing;
 using System;
+using System.Collections;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
-using AhDung.Drawing;
 
 namespace AhDung;
 
@@ -20,7 +22,7 @@ namespace AhDung;
 public static class MessageTip
 {
     //默认字体。当样式中的Font==null时用该字体替换
-    static readonly Font DefaultFont = new Font(SystemFonts.MessageBoxFont.FontFamily, 12);
+    static readonly Font DefaultFont = new(SystemFonts.MessageBoxFont.FontFamily, 12);
 
     //文本格式。用于测量和绘制
     static readonly StringFormat DefStringFormat = StringFormat.GenericTypographic;
@@ -28,48 +30,32 @@ public static class MessageTip
     /// <summary>
     /// 获取或设置默认消息样式
     /// </summary>
-    public static TipStyle DefaultStyle { get; set; }
+    public static TipStyle DefaultStyle { get; set; } = TipStyle.Gray;
 
     /// <summary>
     /// 获取或设置良好消息样式
     /// </summary>
-    public static TipStyle OkStyle { get; set; }
+    public static TipStyle OkStyle { get; set; } = TipStyle.Green;
 
     /// <summary>
     /// 获取或设置警告消息样式
     /// </summary>
-    public static TipStyle WarningStyle { get; set; }
+    public static TipStyle WarningStyle { get; set; } = TipStyle.Orange;
 
     /// <summary>
     /// 获取或设置出错消息样式
     /// </summary>
-    public static TipStyle ErrorStyle { get; set; }
+    public static TipStyle ErrorStyle { get; set; } = TipStyle.Red;
 
     /// <summary>
-    /// 获取或设置全局淡入淡出时长（毫秒）。默认100
+    /// 获取或设置全局淡入淡出时长（毫秒）。默认100。呈现总时长=淡入+停留+淡出，即Fade x 2 + Delay
     /// </summary>
-    public static int Fade { get; set; }
+    public static int Fade { get; set; } = 100;
 
     /// <summary>
-    /// 是否使用漂浮动画。默认true
+    /// 全局消息停留时长（毫秒）。默认1000。呈现总时长=淡入+停留+淡出，即Fade x 2 + Delay
     /// </summary>
-    public static bool Floating { get; set; }
-
-    /// <summary>
-    /// 全局消息停留时长（毫秒）。默认600
-    /// </summary>
-    public static int Delay { get; set; }
-
-    static MessageTip()
-    {
-        Fade         = 100;
-        Floating     = true;
-        Delay        = 600;
-        DefaultStyle = TipStyle.Gray;
-        OkStyle      = TipStyle.Green;
-        WarningStyle = TipStyle.Orange;
-        ErrorStyle   = TipStyle.Red;
-    }
+    public static int Delay { get; set; } = 1000;
 
     /// <summary>
     /// 在指定控件附近显示良好消息
@@ -79,7 +65,7 @@ public static class MessageTip
     /// <param name="delay">消息停留时长(ms)。为负时使用全局时长</param>
     /// <param name="floating">是否漂浮，不指定则使用全局设置</param>
     /// <param name="centerInControl">是否在控件中央显示，不指定则自动判断</param>
-    public static void ShowOk(Component controlOrItem, string text = null, int delay = -1, bool? floating = null, bool? centerInControl = null) =>
+    public static void ShowOk(Component controlOrItem, string text = null, int delay = -1, bool floating = true, bool? centerInControl = null) =>
         Show(controlOrItem, text, OkStyle ?? TipStyle.Green, delay, floating, centerInControl);
 
     /// <summary>
@@ -90,7 +76,7 @@ public static class MessageTip
     /// <param name="floating">是否漂浮，不指定则使用全局设置</param>
     /// <param name="point">消息窗显示位置。不指定则智能判定，当由工具栏项(ToolStripItem)弹出时，请指定该参数或使用接收控件的重载</param>
     /// <param name="centerByPoint">是否以point参数为中心进行呈现。为false则是在其附近呈现</param>
-    public static void ShowOk(string text = null, int delay = -1, bool? floating = null, Point? point = null, bool centerByPoint = false) =>
+    public static void ShowOk(string text = null, int delay = -1, bool floating = true, Point? point = null, bool centerByPoint = false) =>
         Show(text, OkStyle ?? TipStyle.Green, delay, floating, point, centerByPoint);
 
     /// <summary>
@@ -101,7 +87,7 @@ public static class MessageTip
     /// <param name="delay">消息停留时长(ms)。默认1秒，若要使用全局时长请设为-1</param>
     /// <param name="floating">是否漂浮。默认不漂浮。若要使用全局设置请设为null</param>
     /// <param name="centerInControl">是否在控件中央显示，不指定则自动判断</param>
-    public static void ShowWarning(Component controlOrItem, string text = null, int delay = 1000, bool? floating = false, bool? centerInControl = null) =>
+    public static void ShowWarning(Component controlOrItem, string text = null, int delay = -1, bool floating = false, bool? centerInControl = null) =>
         Show(controlOrItem, text, WarningStyle ?? TipStyle.Orange, delay, floating, centerInControl);
 
     /// <summary>
@@ -112,7 +98,7 @@ public static class MessageTip
     /// <param name="floating">是否漂浮。默认不漂浮。若要使用全局设置请设为null</param>
     /// <param name="point">消息窗显示位置。不指定则智能判定，当由工具栏项(ToolStripItem)弹出时，请指定该参数或使用接收控件的重载</param>
     /// <param name="centerByPoint">是否以point参数为中心进行呈现。为false则是在其附近呈现</param>
-    public static void ShowWarning(string text = null, int delay = 1000, bool? floating = false, Point? point = null, bool centerByPoint = false) =>
+    public static void ShowWarning(string text = null, int delay = -1, bool floating = false, Point? point = null, bool centerByPoint = false) =>
         Show(text, WarningStyle ?? TipStyle.Orange, delay, floating, point, centerByPoint);
 
     /// <summary>
@@ -123,7 +109,7 @@ public static class MessageTip
     /// <param name="delay">消息停留时长(ms)。默认1秒，若要使用全局时长请设为-1</param>
     /// <param name="floating">是否漂浮。默认不漂浮。若要使用全局设置请设为null</param>
     /// <param name="centerInControl">是否在控件中央显示，不指定则自动判断</param>
-    public static void ShowError(Component controlOrItem, string text = null, int delay = 1000, bool? floating = false, bool? centerInControl = null) =>
+    public static void ShowError(Component controlOrItem, string text = null, int delay = -1, bool floating = false, bool? centerInControl = null) =>
         Show(controlOrItem, text, ErrorStyle ?? TipStyle.Red, delay, floating, centerInControl);
 
     /// <summary>
@@ -134,7 +120,7 @@ public static class MessageTip
     /// <param name="floating">是否漂浮。默认不漂浮。若要使用全局设置请设为null</param>
     /// <param name="point">消息窗显示位置。不指定则智能判定，当由工具栏项(ToolStripItem)弹出时，请指定该参数或使用接收控件的重载</param>
     /// <param name="centerByPoint">是否以point参数为中心进行呈现。为false则是在其附近呈现</param>
-    public static void ShowError(string text = null, int delay = 1000, bool? floating = false, Point? point = null, bool centerByPoint = false) =>
+    public static void ShowError(string text = null, int delay = -1, bool floating = false, Point? point = null, bool centerByPoint = false) =>
         Show(text, ErrorStyle ?? TipStyle.Red, delay, floating, point, centerByPoint);
 
     /// <summary>
@@ -146,15 +132,21 @@ public static class MessageTip
     /// <param name="delay">消息停留时长(ms)。为负时使用全局时长</param>
     /// <param name="floating">是否漂浮，不指定则使用全局设置</param>
     /// <param name="centerInControl">是否在控件中央显示，不指定则自动判断</param>
-    public static void Show(Component controlOrItem, string text, TipStyle style = null, int delay = -1, bool? floating = null, bool? centerInControl = null)
+    public static void Show(Component controlOrItem, string text, TipStyle style = null, int delay = -1, bool floating = false, bool? centerInControl = null)
     {
-        if (controlOrItem == null)
-        {
-            throw new ArgumentNullException(nameof(controlOrItem));
-        }
-
+        _ = controlOrItem ?? throw new ArgumentNullException(nameof(controlOrItem));
         Show(text, style, delay, floating, GetCenterPosition(controlOrItem), centerInControl ?? IsContainerLike(controlOrItem));
     }
+
+    /*
+     * 目前的实现是show的时候新建消息窗并加入一个集合，
+     * 当集合有元素时会启动一个线程集中跑动画，线程按照指定帧率循环更新集合中的所有消息窗的状态（位置和透明度）。
+     * 动画跑完的消息窗会销毁和移除集合，集合为空时线程跑完结束。
+     * 也就是所有消息的所有动画在一个线程搞掂，相比之前每个消息窗占1个（位移还要再占1个）线程，资源占用大幅优化。
+     */
+
+    static readonly ArrayList _layers = new(5);
+    const           int       MSPF    = 15; //每帧毫秒数
 
     /// <summary>
     /// 显示消息
@@ -165,94 +157,131 @@ public static class MessageTip
     /// <param name="floating">是否漂浮，不指定则使用全局设置</param>
     /// <param name="point">消息窗显示位置。不指定则智能判定，当由工具栏项(ToolStripItem)弹出时，请指定该参数或使用接收控件的重载</param>
     /// <param name="centerByPoint">是否以point参数为中心进行呈现。为false则是在其附近呈现</param>
-    public static void Show(string text, TipStyle style = null, int delay = -1, bool? floating = null, Point? point = null, bool centerByPoint = false)
+    public static void Show(string text, TipStyle style = null, int delay = -1, bool floating = false, Point? point = null, bool centerByPoint = false)
     {
+        var fadeFrames = Fade / MSPF;
+        var totalFrames = fadeFrames * 2 + (delay < 0 ? Delay : delay) / MSPF;
+        if (totalFrames <= 0)
+            throw new ArgumentOutOfRangeException("总帧数小于等于0！请检查Fade和delay。", (Exception)null);
+
         var basePoint = point ?? DetermineHotPoint();
 
-        new Thread(_ =>
+        var layer = new LayeredWindow
         {
-            LayeredWindow layer = null;
-            try
+            BackgroundImage = CreateTipImage(text, style ?? DefaultStyle ?? TipStyle.Gray, out var contentBounds),
+            Alpha           = 0,
+            Location        = GetLocation(contentBounds, basePoint, centerByPoint, out var floatDown),
+            MouseThrough    = true,
+            TopMost         = true,
+            Tag = new ShowData
             {
-                layer = new LayeredWindow
-                {
-                    BackgroundImage = CreateTipImage(text ?? string.Empty, style ?? DefaultStyle ?? TipStyle.Gray, out Rectangle contentBounds),
-                    Alpha           = 0,
-                    Location        = GetLocation(contentBounds, basePoint, centerByPoint, out var floatDown),
-                    MouseThrough    = true,
-                    TopMost         = true,
-                    Tag             = new object[] { delay < 0 ? Delay : delay, floating ?? Floating, floatDown }
-                };
-                layer.Showing += Layer_Showing;
-                layer.Closing += Layer_Closing;
-                layer.Show();
-            }
-            finally
-            {
-                if (layer != null)
-                {
-                    layer.Showing -= Layer_Showing;
-                    layer.Closing -= Layer_Closing;
-                    layer.Dispose();
-                }
-            }
-        }) { IsBackground = true, Name = "T_Showing" }.Start();
+                FadeFrames  = fadeFrames,
+                TotalFrames = totalFrames,
+                FloatOffset = floating ? floatDown ? 1 : -1 : 0,
+            },
+        };
+        layer.SuspendLayout();
+
+        lock (_layers.SyncRoot)
+        {
+            _layers.Add(layer);
+            if (_layers.Count == 1)
+                StartAnimation();
+        }
     }
 
-    static void Layer_Showing(object sender, EventArgs e)
+    static void StartAnimation() => ThreadPool.QueueUserWorkItem(_ =>
     {
-        var layer = (LayeredWindow)sender;
-        var args = layer.Tag as object[];
-        var delay = (int)args[0];
-        var floating = (bool)args[1];
-        var floatDown = (bool)args[2];
+        var stopwatch = new Stopwatch();
+        SwitchTimerResolution(true);
 
-        if (floating)
+        try
         {
-            //另起线程浮动窗体
-            new Thread(_ =>
+            //一圈就是一帧。经测timer精度不如循环
+            while (true)
             {
-                int adj = floatDown ? 1 : -1;
+                stopwatch.Start();
 
-                while (layer.Visible) //layer.IsDisposed有lock，不适合此循环
+                //更新每个消息窗
+                lock (_layers.SyncRoot)
                 {
-                    layer.Top += adj;
-                    Thread.Sleep(30);
-                }
-            }) { IsBackground = true, Name = "T_Floating" }.Start();
-        }
+                    for (var i = 0; i < _layers.Count; i++)
+                    {
+                        var layer = (LayeredWindow)_layers[i];
+                        var data = (ShowData)layer!.Tag;
 
-        FadeEffect(layer, true);
-        Thread.Sleep(delay < 0 ? 0 : delay);
-        layer.Close();
+                        //淡入
+                        if (data.Frame <= data.FadeFrames)
+                        {
+                            if (data.Frame == 0)
+                                layer.Show(); //不能在外面show好，因为要与close处于同一线程
+
+                            layer.Opacity = data.FadeFrames == 0 ? 1 : data.Frame / (float)data.FadeFrames;
+                        }
+                        //淡出
+                        else if (data.TotalFrames - data.Frame is var countdown && countdown <= data.FadeFrames)
+                        {
+                            if (countdown <= 0)
+                            {
+                                layer.Close();
+                                _layers.RemoveAt(i);
+                                i--;
+                                continue;
+                            }
+
+                            layer.Opacity = countdown / (float)data.FadeFrames;
+                        }
+
+                        //位移。实践中每两帧移动1px较合适
+                        if (data.FloatOffset != 0 && data.Frame % 2 == 0)
+                            layer.Top += data.FloatOffset;
+
+                        layer.Update();
+
+                        data.Frame++;
+                    }
+
+                    if (_layers.Count == 0)
+                    {
+                        _layers.Capacity = 5;
+                        break;
+                    }
+                }
+
+                //耗时补偿
+                Thread.Sleep(Math.Max(0, MSPF - (int)stopwatch.ElapsedMilliseconds));
+                stopwatch.Reset();
+            }
+        }
+        finally
+        {
+            SwitchTimerResolution(false);
+            stopwatch.Stop();
+        }
+    });
+
+    //高精计时器开关。不启用的话Thread.Sleep的稳定性没法看
+    //参考：http://mirrors.arcadecontrols.com/www.sysinternals.com/Information/HighResolutionTimers.html
+    static void SwitchTimerResolution(bool enable)
+    {
+        _ = enable ? timeBeginPeriod(1) : timeEndPeriod(1);
+
+        [DllImport("Winmm.dll")]
+        static extern uint timeBeginPeriod(uint uPeriod);
+
+        [DllImport("Winmm.dll")]
+        static extern uint timeEndPeriod(uint uPeriod);
     }
 
-    static void Layer_Closing(object sender, CancelEventArgs e) =>
-        FadeEffect((LayeredWindow)sender, false);
-
-    /// <summary>
-    /// 淡入淡出处理
-    /// </summary>
-    static void FadeEffect(LayeredWindow window, bool fadeIn)
+    class ShowData
     {
-        byte target = fadeIn ? byte.MaxValue : byte.MinValue;
-        const int Updateinterval = 10; //动画更新间隔（毫秒）
-        int step = Fade < Updateinterval ? 0 : (Fade / Updateinterval);
+        public int Frame { get; set; }
 
-        for (int i = 1; i <= step; i++)
-        {
-            Thread.Sleep(Updateinterval);
+        public int FadeFrames { get; set; }
 
-            if (i == step)
-            {
-                break;
-            }
+        public int TotalFrames { get; set; }
 
-            var tmp = (double)(fadeIn ? i : (step - i));
-            window.Alpha = (byte)(tmp / step * 255);
-        }
-
-        window.Alpha = target;
+        public int FloatOffset { get; set; }
     }
 
     /// <summary>
@@ -265,7 +294,7 @@ public static class MessageTip
         var focusControl = Control.FromHandle(GetFocus());
         if (focusControl is TextBoxBase) //若焦点是文本框，取光标位置
         {
-            var pt = GetCaretPosition();
+            GetCaretPos(out var pt);
             pt.Y  += focusControl.Font.Height / 2;
             point =  focusControl.PointToScreen(pt);
         }
@@ -275,12 +304,18 @@ public static class MessageTip
         }
 
         return point;
+
+        [DllImport("User32.dll", SetLastError = true)]
+        static extern bool GetCaretPos(out Point pt);
+
+        [DllImport("user32.dll")]
+        static extern IntPtr GetFocus();
     }
 
     /// <summary>
     /// 创建消息窗图像，同时输出内容区，用于外部定位
     /// </summary>
-    [MethodImpl(MethodImplOptions.Synchronized)] //避免争用style中的图标画笔等资源，否则在同时调用时容易引发资源占用异常
+    [MethodImpl(MethodImplOptions.Synchronized)] //都在UI线程Show的话倒不需要
     static Bitmap CreateTipImage(string text, TipStyle style, out Rectangle contentBounds)
     {
         var size = Size.Empty;
@@ -294,7 +329,7 @@ public static class MessageTip
             textBounds.X    = size.Width;
         }
 
-        if (text.Length != 0)
+        if (text?.Length is > 0)
         {
             if (style.Icon != null)
             {
@@ -354,7 +389,7 @@ public static class MessageTip
                 g.DrawImageUnscaled(style.Icon, iconBounds.Location);
             }
 
-            if (text.Length != 0)
+            if (text?.Length is > 0)
             {
                 textBrush = new SolidBrush(style.TextColor);
                 //DEBUG: g.DrawRectangle(new Border(Color.Red){ Width=1, Direction= Direction.Inner}.Pen, textBounds);
@@ -389,7 +424,7 @@ public static class MessageTip
 
         //横向处理。距离屏幕左右两边太近时的处理
         //多屏下left可能为负，所以right = width - (-left) = width + left
-        int spacing = 10; //至少距离边缘多少像素
+        var spacing = 10; //至少距离边缘多少像素
         int left, right;
         if (p.X < (left = screen.Left + spacing))
         {
@@ -451,9 +486,8 @@ public static class MessageTip
     /// <summary>
     /// 判断控件看起来是否像容器（占一定面积那种）
     /// </summary>
-    static bool IsContainerLike(Component controlOrItem)
-    {
-        if (controlOrItem is ContainerControl
+    static bool IsContainerLike(Component controlOrItem) =>
+        controlOrItem is ContainerControl
             or GroupBox
             or Panel
             or TabControl
@@ -462,40 +496,7 @@ public static class MessageTip
 #endif
             or DataGridView
             or ListBox
-            or ListView)
-        {
-            return true;
-        }
-
-        if (controlOrItem is TextBox { Multiline: true })
-        {
-            return true;
-        }
-
-        if (controlOrItem is RichTextBox { Multiline: true })
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    #region Win32 API
-
-    /// <summary>
-    /// 获取输入光标位置，文本框内坐标
-    /// </summary>
-    static Point GetCaretPosition()
-    {
-        GetCaretPos(out Point pt);
-        return pt;
-    }
-
-    [DllImport("User32.dll", SetLastError = true)]
-    static extern bool GetCaretPos(out Point pt);
-
-    [DllImport("user32.dll")]
-    static extern IntPtr GetFocus();
-
-    #endregion
+            or ListView
+            or TextBox { Multiline: true }
+            or RichTextBox { Multiline: true };
 }

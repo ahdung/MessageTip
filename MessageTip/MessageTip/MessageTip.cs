@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -25,7 +26,13 @@ public static class MessageTip
     static readonly Font DefaultFont = new(SystemFonts.MessageBoxFont.FontFamily, 12);
 
     //文本格式。用于测量和绘制
-    static readonly StringFormat DefStringFormat = StringFormat.GenericTypographic;
+    static readonly StringFormat DefaultStringFormat = new(StringFormatFlags.FitBlackBox | StringFormatFlags.LineLimit | StringFormatFlags.NoClip)
+    {
+        Alignment     = StringAlignment.Near,
+        HotkeyPrefix  = HotkeyPrefix.None,
+        LineAlignment = StringAlignment.Near,
+        Trimming      = StringTrimming.None,
+    };
 
     /// <summary>
     /// 获取或设置默认消息样式
@@ -341,7 +348,7 @@ public static class MessageTip
                 textBounds.X += style.IconSpacing;
             }
 
-            textBounds.Size =  Size.Truncate(GraphicsUtils.MeasureString(text, style.TextFont ?? DefaultFont, 0, DefStringFormat));
+            textBounds.Size =  Size.Truncate(GraphicsUtils.MeasureString(text, style.TextFont ?? DefaultFont, 0, DefaultStringFormat));
             size.Width      += textBounds.Width;
 
             if (size.Height < textBounds.Height)
@@ -397,7 +404,7 @@ public static class MessageTip
             {
                 textBrush = new SolidBrush(style.TextColor);
                 //DEBUG: g.DrawRectangle(new Border(Color.Red){ Width=1, Direction= Direction.Inner}.Pen, textBounds);
-                g.DrawString(text, style.TextFont ?? DefaultFont, textBrush, textBounds.Location, DefStringFormat);
+                g.DrawString(text, style.TextFont ?? DefaultFont, textBrush, textBounds.Location, DefaultStringFormat);
             }
 
             g.Flush(FlushIntention.Sync);

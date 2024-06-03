@@ -197,7 +197,7 @@ public static class MessageTip
         }
     }
 
-    static void StartAnimation() => ThreadPool.QueueUserWorkItem(_ =>
+    static void StartAnimation() => new Thread(_ => //用线程池会偶尔造成消息窗冻结，win10下出现
     {
         var stopwatch = new Stopwatch();
         SwitchTimerResolution(true);
@@ -214,13 +214,13 @@ public static class MessageTip
                 stopwatch.Start();
 #endif
 
-                //更新每个消息窗
+                //更新每个消息窗的当前帧
                 lock (_layers.SyncRoot)
                 {
                     for (var i = 0; i < _layers.Count; i++)
                     {
                         var layer = (LayeredWindow)_layers[i];
-                        var data = (ShowData)layer!.Tag;
+                        var data  = (ShowData)layer!.Tag;
 
                         //淡入
                         if (data.Frame <= data.FadeFrames)
@@ -269,7 +269,8 @@ public static class MessageTip
             SwitchTimerResolution(false);
             stopwatch.Stop();
         }
-    });
+    }) { Name = "T_MessageTip_Animator", IsBackground = true }.Start();
+
 
     //高精计时器开关。不启用的话Thread.Sleep的稳定性没法看
     //参考：http://mirrors.arcadecontrols.com/www.sysinternals.com/Information/HighResolutionTimers.html
@@ -407,7 +408,7 @@ public static class MessageTip
                 g.DrawString(text, style.TextFont ?? DefaultFont, textBrush, textBounds.Location, DefaultStringFormat);
             }
 
-            g.Flush(FlushIntention.Sync);
+            g.Flush();
             return bmp;
         }
         finally

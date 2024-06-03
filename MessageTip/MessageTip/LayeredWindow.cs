@@ -307,7 +307,7 @@ public class LayeredWindow : IDisposable
         using var g = Graphics.FromImage(bmp);
 
         g.Clear(_backgroundColor);
-        g.Flush(System.Drawing.Drawing2D.FlushIntention.Flush);
+        g.Flush();
         _defaultHBmp = bmp.GetHbitmap();
         _oldObj      = SelectObject(_dcMemory, _defaultHBmp);
     }

@@ -14,7 +14,7 @@ namespace AhDung;
 /// </summary>
 public sealed class TipStyle : IDisposable
 {
-    bool _isPresets;
+    bool _isPreset;
     bool _keepFont;
     bool _keepIcon;
 
@@ -110,7 +110,7 @@ public sealed class TipStyle : IDisposable
     /// </summary>
     public TipStyle()
     {
-        Border = new Border(PresetsResources.Colors[0, 0])
+        Border = new Border(PresetResources.Colors[0, 0])
         {
             Behind = true,
             Width  = 2
@@ -124,7 +124,7 @@ public sealed class TipStyle : IDisposable
         TextColor    = Color.Black;
         BackColor    = Color.FromArgb(252, 252, 252);
         CornerRadius = 3;
-        ShadowColor  = PresetsResources.Colors[0, 2];
+        ShadowColor  = PresetResources.Colors[0, 2];
         ShadowRadius = 4;
         ShadowOffset = new Point(0, 3);
         Padding      = new Padding(10, 5, 10, 5);
@@ -145,33 +145,33 @@ public sealed class TipStyle : IDisposable
     /// <summary>
     /// 预置的灰色样式
     /// </summary>
-    public static TipStyle Gray { get; } = CreatePresetsStyle(0);
+    public static TipStyle Gray { get; } = CreatePresetStyle(0);
 
     /// <summary>
     /// 预置的绿色样式
     /// </summary>
-    public static TipStyle Green { get; } = CreatePresetsStyle(1);
+    public static TipStyle Green { get; } = CreatePresetStyle(1);
 
     /// <summary>
     /// 预置的橙色样式
     /// </summary>
-    public static TipStyle Orange { get; } = CreatePresetsStyle(2);
+    public static TipStyle Orange { get; } = CreatePresetStyle(2);
 
     /// <summary>
     /// 预置的红色样式
     /// </summary>
-    public static TipStyle Red { get; } = CreatePresetsStyle(3);
+    public static TipStyle Red { get; } = CreatePresetStyle(3);
 
-    static TipStyle CreatePresetsStyle(int index) => new()
+    static TipStyle CreatePresetStyle(int index) => new()
     {
-        Icon        = PresetsResources.Icons[index],
-        BorderColor = PresetsResources.Colors[index, 0],
-        ShadowColor = PresetsResources.Colors[index, 2],
-        _isPresets  = true,
+        Icon        = PresetResources.Icons[index],
+        BorderColor = PresetResources.Colors[index, 0],
+        ShadowColor = PresetResources.Colors[index, 2],
+        _isPreset  = true,
         BackBrush = r =>
         {
             var brush = new LinearGradientBrush(r,
-                PresetsResources.Colors[index, 1],
+                PresetResources.Colors[index, 1],
                 Color.White,
                 LinearGradientMode.Horizontal);
             brush.SetBlendTriangularShape(0.5f);
@@ -185,7 +185,7 @@ public sealed class TipStyle : IDisposable
     [MethodImpl(MethodImplOptions.Synchronized)]
     void IDisposable.Dispose()
     {
-        if (_disposed || _isPresets) //不销毁预置对象
+        if (_disposed || _isPreset) //不销毁预置对象
             return;
 
         Border.Dispose();
@@ -209,7 +209,7 @@ public sealed class TipStyle : IDisposable
 /// <summary>
 /// 预置资源
 /// </summary>
-file static class PresetsResources
+file static class PresetResources
 {
     public static readonly Color[,] Colors =
     {
@@ -222,12 +222,12 @@ file static class PresetsResources
 
     //CreateIcon依赖Colors，所以需在Colors后初始化
     public static readonly Bitmap[] Icons =
-    {
+    [
         CreateIcon(0),
         CreateIcon(1),
         CreateIcon(2),
         CreateIcon(3)
-    };
+    ];
 
     /// <summary>
     /// 创建图标
@@ -268,7 +268,7 @@ file static class PresetsResources
             {
                 var points = new[] { new Point(12, 3), new Point(3, 20), new Point(21, 20) };
                 pen = new Pen(color, 2) { LineJoin = LineJoin.Bevel };
-                g.DrawPolygon(pen, points);
+                g.DrawPolygon(pen, points); //描边让尖角变圆润
 
                 brush = new SolidBrush(color);
                 g.FillPolygon(brush, points);

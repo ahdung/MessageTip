@@ -187,7 +187,6 @@ public static class MessageTip
                 FloatOffset = floating ? floatDown ? 1 : -1 : 0,
             },
         };
-        layer.SuspendLayout();
 
         lock (_layers.SyncRoot)
         {
@@ -222,6 +221,8 @@ public static class MessageTip
                         var layer = (LayeredWindow)_layers[i];
                         var data  = (ShowData)layer!.Tag;
 
+                        layer.SuspendLayout();
+
                         //淡入
                         if (data.Frame <= data.FadeFrames)
                         {
@@ -248,8 +249,7 @@ public static class MessageTip
                         if (data.FloatOffset != 0 && data.Frame % 2 == 0)
                             layer.Top += data.FloatOffset;
 
-                        layer.Update();
-
+                        layer.ResumeLayout();
                         data.Frame++;
                     }
 

@@ -12,8 +12,8 @@
     <Description>轻型消息窗</Description>
     <Company>AhDung</Company>
     <Product>MessageTip</Product>
-    <Copyright>Copyright © AhDung 2016-2023</Copyright>
-    <Version>2.0.1.0</Version>
+    <Copyright>Copyright © AhDung 2016-2026</Copyright>
+    <Version>2.1.0</Version>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="!$(TargetFramework.Contains('.'))">

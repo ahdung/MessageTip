@@ -1,11 +1,12 @@
 ﻿// Copyright (c) AhDung. All Rights Reserved.
 
+using AhDung.Drawing;
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
-using AhDung.Drawing;
 
 namespace AhDung;
 
@@ -21,7 +22,8 @@ public sealed class TipStyle : IDisposable
     /// <summary>
     /// 获取边框信息。内部用
     /// </summary>
-    internal Border Border { get; }
+    [TypeConverter(typeof(ExpandableObjectConverter))]
+    public Border Border { get; }
 
     /// <summary>
     /// 获取或设置图标。默认null
@@ -56,29 +58,11 @@ public sealed class TipStyle : IDisposable
 
     /// <summary>
     /// 获取或设置背景画刷生成方法
-    /// <para>- 是个委托，入参矩形由绘制函数传入，表示内容区，便于构造画刷</para>
+    /// <para>- 是个委托，入参矩形由绘制函数传入，表示内容区，用于构造渐变之类需要知道绘制区域的画刷</para>
     /// <para>- 默认null，为null时使用BackColor绘制单色背景</para>
-    /// <para>- 方法返回的画刷需释放</para>
     /// </summary>
+    [Browsable(false)]
     public BrushCreator<Rectangle> BackBrush { get; set; }
-
-    /// <summary>
-    /// 获取或设置边框颜色（默认深灰）
-    /// </summary>
-    public Color BorderColor
-    {
-        get => Border.Color;
-        set => Border.Color = value;
-    }
-
-    /// <summary>
-    /// 获取或设置边框粗细（默认1）
-    /// </summary>
-    public int BorderWidth
-    {
-        get => Border.Width / 2;
-        set => Border.Width = value * 2;
-    }
 
     /// <summary>
     /// 获取或设置圆角半径（默认3）
@@ -112,8 +96,7 @@ public sealed class TipStyle : IDisposable
     {
         Border = new Border(PresetResources.Colors[0, 0])
         {
-            Behind = true,
-            Width  = 2
+            Direction = Direction.Outer,
         };
         IconSpacing = 5;
         TextFont    = new Font(SystemFonts.MessageBoxFont.FontFamily, 12);
@@ -162,22 +145,30 @@ public sealed class TipStyle : IDisposable
     /// </summary>
     public static TipStyle Red { get; } = CreatePresetStyle(3);
 
-    static TipStyle CreatePresetStyle(int index) => new()
+    static TipStyle CreatePresetStyle(int index)
     {
-        Icon        = PresetResources.Icons[index],
-        BorderColor = PresetResources.Colors[index, 0],
-        ShadowColor = PresetResources.Colors[index, 2],
-        _isPreset  = true,
-        BackBrush = r =>
+        var style = new TipStyle
         {
-            var brush = new LinearGradientBrush(r,
-                PresetResources.Colors[index, 1],
-                Color.White,
-                LinearGradientMode.Horizontal);
-            brush.SetBlendTriangularShape(0.5f);
-            return brush;
-        },
-    };
+            Icon        = PresetResources.Icons[index],
+            ShadowColor = PresetResources.Colors[index, 2],
+            _isPreset   = true,
+            BackBrush = r =>
+            {
+                var brush = new LinearGradientBrush(r,
+                    PresetResources.Colors[index, 1],
+                    Color.White,
+                    LinearGradientMode.Horizontal);
+                brush.SetBlendTriangularShape(0.5f);
+                return new BrushInfo
+                {
+                    Brush    = brush,
+                    IsOpaque = true,
+                };
+            },
+        };
+        style.Border.Color = PresetResources.Colors[index, 0];
+        return style;
+    }
 
     bool _disposed;
 
@@ -238,10 +229,10 @@ file static class PresetResources
         if (index is < 0 or > 3)
             return null;
 
-        Graphics g = null;
-        Pen pen = null;
-        Brush brush = null;
-        Bitmap bmp = null;
+        Graphics g     = null;
+        Pen      pen   = null;
+        Brush    brush = null;
+        Bitmap   bmp   = null;
         try
         {
             bmp               = new Bitmap(24, 24);
@@ -300,8 +291,27 @@ file static class PresetResources
     }
 }
 
+/// <summary>
+/// 画刷包装类。主要是为了提供透明信息
+/// </summary>
+public class BrushInfo
+{
+    /// <summary>
+    /// 包装的画刷本体
+    /// </summary>
+    public Brush Brush { get; set; }
+
+    /// <summary>
+    /// 指示画刷是否完全实色，就是无任何透明度
+    /// </summary>
+    /// <remarks>
+    /// 为true时会走效果最佳的文字画法，否则按透明背景画，效果要差一点
+    /// </remarks>
+    public bool IsOpaque { get; set; }
+}
+
 //干脆自建一个委托，不依赖Func了
 /// <summary>
 /// 画刷选择器委托
 /// </summary>
-public delegate Brush BrushCreator<in T>(T arg);
+public delegate BrushInfo BrushCreator<in T>(T arg);

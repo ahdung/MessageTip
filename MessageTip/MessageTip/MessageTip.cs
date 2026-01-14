@@ -166,7 +166,7 @@ public static class MessageTip
     /// <param name="centerByPoint">是否以point参数为中心进行呈现。为false则是在其附近呈现</param>
     public static void Show(string text, TipStyle style = null, int delay = -1, bool floating = false, Point? point = null, bool centerByPoint = false)
     {
-        var fadeFrames = Fade / MSPF;
+        var fadeFrames  = Fade / MSPF;
         var totalFrames = fadeFrames * 2 + (delay < 0 ? Delay : delay) / MSPF;
         if (totalFrames <= 0)
             throw new ArgumentOutOfRangeException("总帧数小于等于0！请检查Fade和delay。", (Exception)null);
@@ -330,7 +330,7 @@ public static class MessageTip
     [MethodImpl(MethodImplOptions.Synchronized)] //都在UI线程Show的话倒不需要
     static Bitmap CreateTipImage(string text, TipStyle style, out Rectangle contentBounds)
     {
-        var size = Size.Empty;
+        var size       = Size.Empty;
         var iconBounds = Rectangle.Empty;
         var textBounds = Rectangle.Empty;
 
@@ -376,16 +376,29 @@ public static class MessageTip
 
         var bmp = new Bitmap(fullBounds.Width, fullBounds.Height);
 
-        Graphics g = null;
-        Brush backBrush = null;
-        Brush textBrush = null;
+        Graphics g         = null;
+        Brush    backBrush = null;
         try
         {
             g                 = Graphics.FromImage(bmp);
             g.SmoothingMode   = SmoothingMode.HighQuality;
             g.PixelOffsetMode = PixelOffsetMode.HighQuality;
 
-            backBrush = (style.BackBrush ?? (_ => new SolidBrush(style.BackColor)))(contentBounds);
+            bool isOpaque;
+            if (style.BackBrush is { } creator)
+            {
+                var info = creator(contentBounds);
+                backBrush = info.Brush;
+                isOpaque  = info.IsOpaque;
+            }
+            else
+            {
+                var color = style.BackColor;
+                backBrush = new SolidBrush(color);
+                isOpaque  = color.A == 255;
+            }
+
+            // paint background
             GraphicsUtils.DrawRectangle(g, contentBounds,
                 backBrush,
                 style.Border,
@@ -395,15 +408,31 @@ public static class MessageTip
                 style.ShadowOffset.X,
                 style.ShadowOffset.Y);
 
+            // paint icon
             if (style.Icon != null)
             {
                 //DEBUG: g.DrawRectangle(new Border(Color.Red) { Width = 1, Direction = Direction.Inner }.Pen, iconBounds);
                 g.DrawImageUnscaled(style.Icon, iconBounds.Location);
             }
 
-            if (text?.Length is > 0)
+            // paint text
+            if (text is { Length: not 0 } && style.TextColor is { A: not 0 } textColor)
             {
-                textBrush = new SolidBrush(style.TextColor);
+                //TextRenderingHint.ClearTypeGridFit画在透明背景上时会有黑边，所以背景存在透明像素时要用下面的的画法
+                //才能得到好的文字效果。但如果无透明像素，ClearTypeGridFit的效果还是要好很多，尤其在Win7上，所以分情况处理
+
+                if (isOpaque) //不考虑阴影是否实色，因为阴影允许设置偏移，所以就算是实色阴影如果偏移太多也是等于没底色
+                    g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+                else
+                {
+                    //这两个Mode不改的话，AntiAliasGridFit得到的文字会发虚发糊
+                    g.SmoothingMode     = SmoothingMode.Default;
+                    g.PixelOffsetMode   = PixelOffsetMode.Default;
+                    g.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
+                }
+
+                using var textBrush = new SolidBrush(textColor);
+
                 //DEBUG: g.DrawRectangle(new Border(Color.Red){ Width=1, Direction= Direction.Inner}.Pen, textBounds);
                 g.DrawString(text, style.TextFont ?? DefaultFont, textBrush, textBounds.Location, DefaultStringFormat);
             }
@@ -415,7 +444,6 @@ public static class MessageTip
         {
             g?.Dispose();
             backBrush?.Dispose();
-            textBrush?.Dispose();
         }
     }
 

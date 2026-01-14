@@ -1,6 +1,7 @@
 ﻿// Copyright (c) AhDung. All Rights Reserved.
 
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
@@ -74,6 +75,7 @@ public class Border : IDisposable
     /// <summary>
     /// 获取用于画本边框的画笔。建议销毁本类而不是该画笔
     /// </summary>
+    [Browsable(false)]
     public Pen Pen { get; }
 
     /// <summary>

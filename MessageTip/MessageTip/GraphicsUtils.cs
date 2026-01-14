@@ -34,8 +34,8 @@ internal static class GraphicsUtils
     /// </summary>
     public static SizeF MeasureString(string text, Font font, SizeF area, StringFormat stringFormat = null)
     {
-        IntPtr dcScreen = IntPtr.Zero;
-        Graphics g = null;
+        IntPtr   dcScreen = IntPtr.Zero;
+        Graphics g        = null;
         try
         {
             dcScreen          = GetDC(IntPtr.Zero);
@@ -69,7 +69,7 @@ internal static class GraphicsUtils
             return path;
         }
 
-        int d = radius * 2;
+        int d   = radius * 2;
         var arc = rectangle with { Width = d, Height = d };
         path.AddArc(arc, 180, 90);
         arc.X = rectangle.X + rectangle.Width - d;
@@ -83,7 +83,7 @@ internal static class GraphicsUtils
     }
 
     /// <summary>
-    /// 绘制矩形。可带圆角、阴影
+    /// 画矩形。可带圆角、阴影
     /// </summary>
     /// <param name="g"></param>
     /// <param name="rectangle">矩形</param>
@@ -96,34 +96,43 @@ internal static class GraphicsUtils
     /// <param name="offsetY">阴影纵向偏移</param>
     public static void DrawRectangle(Graphics g, Rectangle rectangle, Brush brush, Border border, int radius, Color shadowColor, int shadowRadius = 0, int offsetX = 0, int offsetY = 0)
     {
-        if (shadowColor.A == 0 || (shadowRadius == 0 && offsetX == 0 && offsetY == 0))
-        {
-            DrawRectangle(g, rectangle, brush, border, radius);
-            return;
-        }
+        using var path = GetRoundedRectangle(rectangle, radius);
 
-        GraphicsPath path = null;
-        Bitmap shadow = null;
-        try
+        var shouldDrawShadow = shadowColor.A != 0 && (shadowRadius != 0 || offsetX != 0 || offsetY != 0 || (brush as SolidBrush)?.Color.A is not 255);
+      
+        if (shouldDrawShadow)
         {
-            path   = GetRoundedRectangle(rectangle, radius);
-            shadow = DropShadow.Create(path, shadowColor, shadowRadius);
+            using var shadow = DropShadow.Create(path, shadowColor, shadowRadius);
 
             var shadowBounds = DropShadow.GetBounds(rectangle, shadowRadius);
             shadowBounds.Offset(offsetX, offsetY);
 
             g.DrawImageUnscaled(shadow, shadowBounds.Location);
-            DrawPath(g, path, brush, border);
         }
-        finally
-        {
-            path?.Dispose();
-            shadow?.Dispose();
-        }
+
+        DrawPath(g, path, brush, border);
     }
 
     /// <summary>
-    /// 画矩形
+    /// 画矩形。可带圆角、阴影
+    /// </summary>
+    /// <param name="g"></param>
+    /// <param name="rectangle">矩形</param>
+    /// <param name="backColor">用于填充的颜色</param>
+    /// <param name="border">边框描述对象。对象无效则不描边</param>
+    /// <param name="radius">圆角半径</param>
+    /// <param name="shadowColor">阴影颜色</param>
+    /// <param name="shadowRadius">阴影羽化半径</param>
+    /// <param name="offsetX">阴影横向偏移</param>
+    /// <param name="offsetY">阴影纵向偏移</param>
+    public static void DrawRectangle(Graphics g, Rectangle rectangle, Color backColor, Border border, int radius, Color shadowColor, int shadowRadius = 0, int offsetX = 0, int offsetY = 0)
+    {
+        using var brush = MakeBrushIfNeeded(backColor);
+        DrawRectangle(g, rectangle, brush, border, radius, shadowColor, shadowRadius, offsetX, offsetY);
+    }
+
+    /// <summary>
+    /// 画矩形。可带圆角
     /// </summary>
     /// <param name="g"></param>
     /// <param name="rectangle">矩形</param>
@@ -137,6 +146,20 @@ internal static class GraphicsUtils
     }
 
     /// <summary>
+    /// 画矩形。可带圆角
+    /// </summary>
+    /// <param name="g"></param>
+    /// <param name="rectangle">矩形</param>
+    /// <param name="backColor">用于填充的颜色</param>
+    /// <param name="border">边框描述对象。对象无效则不描边</param>
+    /// <param name="radius">圆角半径</param>
+    public static void DrawRectangle(Graphics g, Rectangle rectangle, Color backColor, Border border = null, int radius = 0)
+    {
+        using var brush = MakeBrushIfNeeded(backColor);
+        DrawRectangle(g, rectangle, brush, border, radius);
+    }
+
+    /// <summary>
     /// 画路径
     /// </summary>
     /// <param name="g"></param>
@@ -145,22 +168,41 @@ internal static class GraphicsUtils
     /// <param name="border">边框描述对象。对象无效则不描边</param>
     public static void DrawPath(Graphics g, GraphicsPath path, Brush brush = null, Border border = null)
     {
-        if (Border.IsValid(border) && border.Behind)
-        {
-            g.DrawPath(border.Pen, path);
-        }
+        var isValidBorder = Border.IsValid(border);
 
-        if (brush != null)
+        if (isValidBorder && border.Behind)
+            g.DrawPath(border.Pen, path);
+
+        var shouldFill = brush switch
         {
+            SolidBrush sb => sb.Color.A != 0,
+            not null      => true,
+            _             => false
+        };
+
+        if (shouldFill)
             g.FillPath(brush, path);
-        }
 
-        if (Border.IsValid(border) && !border.Behind)
-        {
+        if (isValidBorder && !border.Behind)
             g.DrawPath(border.Pen, path);
-        }
     }
 
+    /// <summary>
+    /// 画路径
+    /// </summary>
+    /// <param name="g"></param>
+    /// <param name="path">路径</param>
+    /// <param name="backColor">用于填充的颜色</param>
+    /// <param name="border">边框描述对象。对象无效则不描边</param>
+    public static void DrawPath(Graphics g, GraphicsPath path, Color backColor, Border border = null)
+    {
+        using var brush = MakeBrushIfNeeded(backColor);
+        DrawPath(g, path, brush, border);
+    }
+
+    static SolidBrush MakeBrushIfNeeded(Color color) => color.A == 0
+        ? null
+        : new SolidBrush(color);
 
     #region Win32 API
 
@@ -234,10 +276,10 @@ file static class DropShadow
         }
 
         //将形状用color色画在阴影区中心
-        Graphics g = null;
+        Graphics     g        = null;
         GraphicsPath pathCopy = null;
-        Matrix matrix = null;
-        SolidBrush brush = null;
+        Matrix       matrix   = null;
+        SolidBrush   brush    = null;
         try
         {
             matrix = new Matrix();
@@ -317,11 +359,11 @@ file static class DropShadow
             }
         }
 
-        var p2 = new byte[p1.Length];
+        var p2      = new byte[p1.Length];
         int radius2 = 2 * radius + 1;
         int First, Last, Sum;
         int stride = data.Stride,
-            width = data.Width,
+            width  = data.Width,
             height = data.Height;
 
         //只处理Alpha通道
@@ -330,7 +372,7 @@ file static class DropShadow
         for (int r = 0; r < height; r++)
         {
             int start = r * stride;
-            int left = start;
+            int left  = start;
             int right = start + radius * CHANNELS;
 
             First = p1[start + 3];
@@ -364,8 +406,8 @@ file static class DropShadow
         //纵向
         for (int column = 0; column < width; column++)
         {
-            int start = column * CHANNELS;
-            int top = start;
+            int start  = column * CHANNELS;
+            int top    = start;
             int bottom = start + radius * stride;
 
             First = p2[start + 3];
